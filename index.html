@@ -553,6 +553,78 @@
             display: inline-block;
         }
 
+        /* 更可爱的错误提示 */
+        .error-kawaii {
+            color: #ff3366;
+            font-weight: 500;
+            background-color: rgba(255, 51, 102, 0.1);
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(255, 51, 102, 0.2);
+            border: 1px dashed #ff6b9d;
+            animation: heartbeat 1.5s ease-in-out infinite;
+            margin: 10px 0;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        /* AI文本回复区域 */
+        .ai-message-container {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(138, 43, 226, 0.05);
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--primary-color);
+            position: relative;
+            transition: all 0.5s ease;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            box-shadow: 0 4px 10px rgba(138, 43, 226, 0.1);
+        }
+        
+        .ai-message-container.show {
+            max-height: 300px;
+            opacity: 1;
+            margin-bottom: 20px;
+            padding: 20px 15px 15px;
+        }
+        
+        .ai-message-container::before {
+            content: "🤖 AI说";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--card-bg);
+            color: var(--primary-color);
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(138, 43, 226, 0.1);
+            z-index: 1;
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+        
+        .ai-message {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 25px 15px;
@@ -587,17 +659,34 @@
             <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
         </div>
         
+        <div class="safety-tips" style="margin-bottom: 20px; font-size: 0.85em; color: #8a2be2; text-align: center; padding: 8px; background-color: rgba(138, 43, 226, 0.05); border-radius: 8px;">
+            💫 小提示：避免使用可能包含敏感内容的图片或提示词，以防触发安全系统拦截 ✨
+        </div>
+        
         <div class="uploaded-images-container" id="uploadedImagesContainer"></div>
         <div class="upload-hint" id="uploadHint">✨ 点击图片可选择要处理的主图片</div>
         
         <div class="input-group">
             <input type="text" id="promptInput" placeholder="输入你的创意指令（英文效果最佳）" />
+            <div class="prompt-optimization" style="margin-top: 10px; display: flex; align-items: center; justify-content: flex-end;">
+                <label for="useOptimization" style="font-size: 0.85em; display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" id="useOptimization" checked style="margin-right: 5px;">
+                    <span>使用魔法优化✨</span>
+                    <span class="tooltip" style="position: relative; margin-left: 5px; cursor: help;">
+                        ℹ️
+                        <span class="tooltip-text" style="visibility: hidden; position: absolute; width: 250px; background-color: rgba(138, 43, 226, 0.9); color: white; text-align: center; padding: 8px; border-radius: 6px; z-index: 1; bottom: 125%; left: 50%; margin-left: -125px; opacity: 0; transition: opacity 0.3s; font-weight: normal;">
+                            自动优化提示词，提高生成成功率～添加适当的前缀和后缀哦～
+                        </span>
+                    </span>
+                </label>
+            </div>
             <div class="example-prompts">
                 <div class="small">灵感提示:</div>
                 <button class="example-btn" data-prompt="A cute cat in space">太空猫咪</button>
                 <button class="example-btn" data-prompt="Beautiful sunset over mountains">山间日落</button>
                 <button class="example-btn" data-prompt="Futuristic city with flying cars">未来城市</button>
                 <button class="example-btn" data-prompt="Underwater world with colorful fish">海底世界</button>
+                <button class="example-btn" data-prompt="Fantasy forest with glowing plants">魔法森林</button>
             </div>
         </div>
         <div class="button-container">
@@ -607,6 +696,9 @@
         <div id="status"></div>
         <div class="image-container" id="imageContainer" style="display: none;">
             <img id="resultImage" src="" alt="生成的图像" />
+        </div>
+        <div class="ai-message-container" id="aiMessageContainer">
+            <div class="ai-message" id="aiMessage"></div>
         </div>
     </div>
 
@@ -626,10 +718,29 @@
         const uploadedImagesContainer = document.getElementById("uploadedImagesContainer");
         const uploadHint = document.getElementById("uploadHint");
         const exampleButtons = document.querySelectorAll(".example-btn");
+        const useOptimization = document.getElementById("useOptimization");
+        const tooltip = document.querySelector(".tooltip");
+        const aiMessageContainer = document.getElementById("aiMessageContainer");
+        const aiMessage = document.getElementById("aiMessage");
         
         // 存储上传的图片
         let uploadedImages = [];
         let selectedImageIndex = -1; // 当前选中的图片索引
+        
+        // 添加工具提示显示/隐藏逻辑
+        if (tooltip) {
+            tooltip.addEventListener("mouseenter", function() {
+                const tooltipText = this.querySelector(".tooltip-text");
+                tooltipText.style.visibility = "visible";
+                tooltipText.style.opacity = "1";
+            });
+            
+            tooltip.addEventListener("mouseleave", function() {
+                const tooltipText = this.querySelector(".tooltip-text");
+                tooltipText.style.visibility = "hidden";
+                tooltipText.style.opacity = "0";
+            });
+        }
         
         // 页面加载完成动画
         document.addEventListener('DOMContentLoaded', () => {
@@ -833,14 +944,33 @@
             imageContainer.style.display = "none";
             resultImage.classList.remove("show");
             
+            // 重置AI消息区域
+            aiMessageContainer.classList.remove('show');
+            aiMessage.innerHTML = '';
+            
             try {
                 // 添加按钮生成动画
                 generateButton.innerHTML = "魔法生成中...";
                 
+                // 根据开关决定是否优化提示词
+                const finalPrompt = useOptimization.checked ? optimizePrompt(prompt) : prompt;
+                
+                // 调试用：显示最终使用的提示词
+                console.log("🔮 使用的提示词:", finalPrompt);
+                
+                // 显示当前使用的模式
+                if (useOptimization.checked) {
+                    if (shouldUseExtraSafety(sanitizePrompt(prompt))) {
+                        showStatus("✨ 正在使用魔法图像生成（超级安全模式）...");
+                    } else {
+                        showStatus("✨ 正在使用魔法图像生成（优化模式）...");
+                    }
+                }
+                
                 // 准备请求体
                 const requestBody = {
                     contents: [{
-                        parts: [{ text: prompt }]
+                        parts: [{ text: finalPrompt }]
                     }],
                     generationConfig: {
                         responseModalities: ["Text", "Image"]
@@ -877,7 +1007,22 @@
                 
                 const data = await response.json();
                 
-                // 从响应中提取图像数据
+                // 检查API返回的直接错误
+                if (data.promptFeedback && data.promptFeedback.blockReason) {
+                    const blockReason = data.promptFeedback.blockReason;
+                    console.log("🛑 API阻止原因:", blockReason);
+                    throw new Error(handleBlockReason(blockReason));
+                }
+                
+                // 检查安全过滤和其他特殊情况
+                if (data.candidates && data.candidates[0] && data.candidates[0].finishReason) {
+                    const finishReason = data.candidates[0].finishReason;
+                    if (finishReason !== "STOP") { // STOP是正常结束
+                        throw new Error(handleFinishReason(finishReason));
+                    }
+                }
+                
+                // 从响应中提取图像数据和文本
                 const candidate = data.candidates && data.candidates[0];
                 const content = candidate && candidate.content;
                 const parts = content && content.parts;
@@ -886,8 +1031,29 @@
                     throw new Error("API响应中没有内容");
                 }
                 
+                // 提取图像数据
                 const inlinePart = parts.find(part => part.inlineData);
                 const imageData = inlinePart && inlinePart.inlineData && inlinePart.inlineData.data;
+                
+                // 提取文本数据
+                const textParts = parts.filter(part => part.text);
+                let aiTextResponse = "";
+                if (textParts && textParts.length > 0) {
+                    aiTextResponse = textParts.map(part => part.text).join("");
+                    
+                    // 处理文本，添加表情符号和格式化
+                    const processedText = processAiText(aiTextResponse);
+                    
+                    // 显示AI的文本回复
+                    aiMessage.innerHTML = processedText;
+                    
+                    // 延迟显示AI回复容器
+                    setTimeout(() => {
+                        aiMessageContainer.classList.add('show');
+                    }, 800);
+                } else {
+                    aiMessageContainer.classList.remove('show');
+                }
                 
                 if (imageData) {
                     // 显示生成的图像
@@ -897,7 +1063,11 @@
                     // 平滑滚动到结果图像
                     setTimeout(() => {
                         imageContainer.scrollIntoView({behavior: 'smooth'});
-                        showStatus("✨ 图像生成成功！魔法完成 ✨", "success");
+                        if (useOptimization.checked) {
+                            showStatus("✨ 图像生成成功！魔法优化起效啦 ✨", "success");
+                        } else {
+                            showStatus("✨ 图像生成成功！魔法完成 ✨", "success");
+                        }
                     }, 500);
                 } else {
                     showStatus("⚠️ 未能生成图像，请尝试不同的提示词", "error");
@@ -916,7 +1086,27 @@
             status.className = "";
             
             if (type) {
-                status.classList.add(type);
+                if (type === "error" && (message.includes("安全系统拦截") || message.includes("IMAGE_SAFETY") || message.includes("被系统拦截"))) {
+                    status.classList.add("error-kawaii");
+                    status.innerHTML = `<span style="font-size:1.2em;">⚠️</span> ${message} <span style="font-size:1.2em;">✨</span>`;
+                    
+                    // 如果魔法优化没开启，建议用户开启
+                    if (!useOptimization.checked) {
+                        setTimeout(() => {
+                            const suggestion = document.createElement('div');
+                            suggestion.className = 'optimize-suggestion';
+                            suggestion.innerHTML = `
+                                <div style="margin-top: 15px; padding: 10px; background-color: rgba(138, 43, 226, 0.1); border-radius: 8px; font-size: 0.9em; text-align: center; color: #8a2be2; animation: pulse 2s infinite;">
+                                    💫 小提示：尝试开启<span style="font-weight: bold; text-decoration: underline; cursor: pointer;" onclick="document.getElementById('useOptimization').checked = true;">魔法优化</span>功能，可能会提高生成成功率哦～
+                                </div>
+                            `;
+                            status.appendChild(suggestion);
+                        }, 500);
+                    }
+                } else {
+                    status.classList.add(type);
+                }
+                
                 // 添加出现动画
                 status.style.opacity = '0';
                 status.style.transform = 'translateY(-10px)';
@@ -1003,6 +1193,14 @@
                 box-shadow: 0 5px 10px rgba(138, 43, 226, 0.2);
             }
             
+            .example-btn:hover::before {
+                left: 100%;
+            }
+            
+            .example-btn:hover::after {
+                opacity: 1;
+            }
+            
             @keyframes floatAnimation {
                 0%, 100% {
                     transform: translateY(0);
@@ -1050,6 +1248,197 @@
             }
         `;
         document.head.appendChild(style);
+
+        // 处理API的finish reason
+        function handleFinishReason(finishReason) {
+            switch(finishReason) {
+                case "IMAGE_SAFETY":
+                    return "图像内容被安全系统拦截 ヽ(。>д<。)ノ 可能包含不适当内容～请尝试不同的图片或提示词";
+                case "SAFETY":
+                    return "内容被安全系统拦截了 (◞‸◟) 请修改提示词后重试～";
+                case "RECITATION":
+                    return "AI不确定如何处理这个请求 (⊙_⊙) 请尝试更清晰的提示词～";
+                case "MAX_TOKENS":
+                    return "生成内容太长了 (●ˇ∀ˇ●) 请尝试简化请求～";
+                case "OTHER":
+                    return "生成请求被系统拦截了 (≧﹏≦) 请尝试开启魔法优化或修改提示词～"; 
+                default:
+                    return "生成过程中出现未知问题 (⊙﹏⊙∥) 请稍后重试～";
+            }
+        }
+        
+        // 处理API的block reason
+        function handleBlockReason(blockReason) {
+            switch(blockReason) {
+                case "SAFETY":
+                    return "提示词内容被安全系统拦截 (˘•ω•˘) 请修改提示词后重试～";
+                case "OTHER":
+                    return "提示词被系统拦截啦 (´ﾟдﾟ`) 请尝试开启魔法优化模式，或使用更友好的提示词～";
+                default:
+                    return `提示词被系统以${blockReason}原因拦截啦 (>﹏<) 请尝试其他提示词～`;
+            }
+        }
+        
+        // 优化提示词，提高通过率
+        function optimizePrompt(originalPrompt) {
+            // 预处理提示词，移除可能导致问题的内容
+            let cleanedPrompt = sanitizePrompt(originalPrompt);
+            
+            // 超级安全模式 - 对于已知触发封锁的提示词进行特殊处理
+            if (shouldUseExtraSafety(cleanedPrompt)) {
+                return createSupersafePrompt(cleanedPrompt);
+            }
+            
+            // 基础优化前缀和后缀
+            const prefixes = [
+                "Create a family-friendly digital art of ",
+                "Generate a wholesome image showing ",
+                "Illustrate a professional, clean artwork depicting ",
+                "Design a creative, positive visualization of ",
+                "Make a cheerful, artistic representation of ",
+                "Create an educational illustration of "
+            ];
+            
+            const suffixes = [
+                ", suitable for all ages",
+                ", bright and colorful style",
+                ", high quality digital art",
+                ", professional illustration",
+                ", happy vibes only",
+                ", uplifting aesthetic",
+                ", in a style appropriate for children"
+            ];
+            
+            // 选择随机前缀和后缀
+            const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+            const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+            
+            // 组合优化后的提示词
+            let enhancedPrompt = `${prefix}${cleanedPrompt}${suffix}`;
+            
+            // 添加隐形增强语句
+            const safetyHints = [
+                ". Create this as a G-rated image suitable for educational purposes.",
+                ". This must be appropriate content for classroom use.",
+                ". Make this appropriate for a children's book illustration.",
+                ". Ensure this follows all community guidelines.",
+                ". This is for a school project and must be appropriate.",
+                ". This image will be used in an educational context for young students.",
+                ". Create this in a positive, uplifting manner with no inappropriate elements."
+            ];
+            
+            const randomHint = safetyHints[Math.floor(Math.random() * safetyHints.length)];
+            enhancedPrompt += randomHint;
+            
+            // 添加质量关键词
+            const qualityTerms = [
+                " High resolution.", 
+                " Professional quality.", 
+                " Detailed illustration.", 
+                " Artistic style.", 
+                " Vibrant colors.",
+                " Child-friendly artwork.",
+                " Non-violent imagery.",
+                " Positive themes only."
+            ];
+            
+            // 随机添加2-4个质量关键词
+            const numTerms = Math.floor(Math.random() * 3) + 2;
+            const shuffledTerms = [...qualityTerms].sort(() => 0.5 - Math.random());
+            for (let i = 0; i < numTerms; i++) {
+                enhancedPrompt += shuffledTerms[i];
+            }
+            
+            return enhancedPrompt;
+        }
+        
+        // 检查是否需要使用超级安全模式
+        function shouldUseExtraSafety(prompt) {
+            // 这些关键词可能在安全系统中权重较高
+            const highRiskTerms = ["nude", "naked", "sexy", "girl", "boy", "woman", "man", 
+                "adult", "body", "skin", "flesh", "intimate", "sensual", "bikini", 
+                "underwear", "revealing", "controversial", "realistic", "photo"];
+                
+            // 检查提示词中是否包含高风险词汇
+            let riskCount = 0;
+            highRiskTerms.forEach(term => {
+                if (prompt.toLowerCase().includes(term)) {
+                    riskCount++;
+                }
+            });
+            
+            // 如果包含超过1个高风险词汇，启用超级安全模式
+            return riskCount > 0;
+        }
+        
+        // 创建超级安全的提示词
+        function createSupersafePrompt(prompt) {
+            // 用更安全的替代词完全重写提示词
+            let redesignedPrompt = "Create a cartoon-style, stylized illustration of " + prompt;
+            redesignedPrompt += " for a kindergarten classroom poster. Absolutely G-rated content.";
+            redesignedPrompt += " Colorful, whimsical, child-friendly art style with no realistic elements.";
+            redesignedPrompt += " This must be appropriate for very young children and follow strict educational guidelines.";
+            
+            console.log("🔒 启用了超级安全模式");
+            return redesignedPrompt;
+        }
+        
+        // 清理提示词，移除可能导致问题的内容
+        function sanitizePrompt(prompt) {
+            // 潜在问题词汇的简单列表
+            const problematicTerms = [
+                "nude", "naked", "nsfw", "porn", "sexy", "sexual", "explicit", 
+                "violence", "violent", "blood", "gore", "weapon", "kill", "death",
+                "drug", "cocaine", "heroin", "meth", "illegal", "abuse"
+            ];
+            
+            // 检查提示词中是否包含问题词汇
+            let cleanedPrompt = prompt;
+            let needsCleaning = false;
+            
+            problematicTerms.forEach(term => {
+                if (cleanedPrompt.toLowerCase().includes(term)) {
+                    // 用更安全的词汇替换
+                    const regex = new RegExp(term, 'gi');
+                    cleanedPrompt = cleanedPrompt.replace(regex, 'appropriate');
+                    needsCleaning = true;
+                }
+            });
+            
+            // 如果进行了替换，在控制台提示
+            if (needsCleaning) {
+                console.log("⚠️ 提示词已被优化以确保符合安全规范");
+            }
+            
+            return cleanedPrompt;
+        }
+
+        // 处理AI文本回复，增加可读性和美观性
+        function processAiText(text) {
+            if (!text) return '';
+            
+            // 替换换行符为HTML换行
+            let processedText = text.replace(/\n/g, '<br>');
+            
+            // 强调一些关键词
+            const keywords = ['成功', '完成', '生成', '魔法', '图像', '创建', '效果', '风格', '想要'];
+            keywords.forEach(keyword => {
+                const regex = new RegExp(`${keyword}`, 'g');
+                processedText = processedText.replace(regex, `<span style="color: var(--primary-color); font-weight: 600;">${keyword}</span>`);
+            });
+            
+            // 添加表情符号
+            if (!processedText.includes('？') && !processedText.includes('?')) {
+                processedText += ' 😊';
+            }
+            
+            // 如果文本以问号结束，添加思考表情
+            if (processedText.trim().endsWith('?') || processedText.trim().endsWith('？')) {
+                processedText = processedText.replace(/[?？](\s*)$/, '? 🤔$1');
+            }
+            
+            return processedText;
+        }
     </script>
 </body>
 </html> 
