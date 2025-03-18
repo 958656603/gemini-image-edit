@@ -35,7 +35,52 @@
             padding: 20px;
             line-height: 1.6;
             min-height: 100vh;
-            background-image: radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.05) 0%, rgba(215, 215, 255, 0.1) 90%);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.05) 0%, rgba(215, 215, 255, 0.1) 90%),
+                linear-gradient(45deg, rgba(255, 107, 157, 0.05) 0%, rgba(138, 43, 226, 0.05) 100%);
+            background-attachment: fixed;
+            animation: backgroundShimmer 15s infinite alternate;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* 添加背景闪光粒子 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 30% 40%, rgba(255, 107, 157, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 70% 60%, rgba(138, 43, 226, 0.1) 0%, transparent 30%);
+            z-index: -1;
+            opacity: 0.7;
+            animation: shimmer 15s infinite alternate;
+        }
+        
+        @keyframes backgroundShimmer {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+        
+        @keyframes shimmer {
+            0% {
+                background-position: 0% 0%;
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                background-position: 100% 100%;
+                opacity: 0.5;
+            }
         }
         
         .container {
@@ -43,11 +88,25 @@
             margin: 20px auto;
             background-color: var(--card-bg);
             border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow), 0 0 30px rgba(255, 107, 157, 0.1);
             padding: 35px;
             transition: var(--transition);
             overflow: hidden;
             position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: containerFadeIn 1s ease-out;
+        }
+        
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .container::before {
@@ -58,6 +117,50 @@
             width: 100%;
             height: 6px;
             background: var(--gradient);
+            animation: rainbowShift 6s infinite linear;
+            background-size: 200% 200%;
+        }
+        
+        @keyframes rainbowShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        /* 添加魔法星星效果 */
+        .magic-stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            background-image: radial-gradient(var(--primary-light) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: twinkle 4s infinite;
+            opacity: 0;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0.1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
         }
         
         h1 {
@@ -65,13 +168,22 @@
             font-weight: 700;
             letter-spacing: -0.5px;
             text-align: center;
-            background: var(--gradient);
+            background-image: linear-gradient(135deg, #8a2be2, #ff6b9d, #8a2be2);
+            background-size: 200% auto;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             position: relative;
             padding-bottom: 15px;
+            animation: shine 5s linear infinite;
+            text-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
+        }
+        
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
         }
         
         h1::after {
@@ -80,10 +192,23 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 60px;
+            width: 80px;
             height: 3px;
             background: var(--gradient);
             border-radius: 3px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(138, 43, 226, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(138, 43, 226, 0);
+            }
         }
         
         /* 上传区域样式 */
@@ -123,7 +248,8 @@
         }
         
         .upload-area:hover .upload-icon {
-            transform: scale(1.1);
+            transform: scale(1.1) rotate(5deg);
+            filter: drop-shadow(0 0 5px rgba(138, 43, 226, 0.6));
         }
         
         .upload-text {
@@ -159,9 +285,9 @@
         }
         
         .example-btn:hover {
-            background-color: rgba(138, 43, 226, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(138, 43, 226, 0.15);
+            background-image: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 107, 157, 0.2));
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 5px 10px rgba(138, 43, 226, 0.2);
         }
         
         /* 上传图片展示区域 */
@@ -284,11 +410,13 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
-            transition: var(--transition);
+            transition: all 0.4s ease;
             box-shadow: 0 6px 15px rgba(138, 43, 226, 0.3);
             position: relative;
             overflow: hidden;
             letter-spacing: 0.5px;
+            z-index: 1;
+            transform-style: preserve-3d;
         }
         
         #generateButton::before {
@@ -298,21 +426,40 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transition: all 0.4s;
+            z-index: -1;
+        }
+        
+        #generateButton::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            background: var(--gradient-hover);
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: -2;
         }
         
         #generateButton:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.4);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.5);
+            letter-spacing: 1px;
         }
         
         #generateButton:hover::before {
             left: 100%;
         }
         
+        #generateButton:hover::after {
+            opacity: 1;
+        }
+        
         #generateButton:active {
-            transform: translateY(0);
+            transform: translateY(0) scale(0.98);
             box-shadow: 0 4px 10px rgba(138, 43, 226, 0.25);
         }
         
@@ -427,8 +574,11 @@
     </style>
 </head>
 <body>
+    <!-- 添加魔法星星背景 -->
+    <div class="magic-stars" id="magicStars"></div>
+    
     <div class="container">
-        <h1>Gemini 2.0 图像魔法</h1>
+        <h1>✨ Gemini 魔法图像工坊 ✨</h1>
         
         <div class="upload-area" id="uploadArea">
             <div class="upload-icon">🖼️</div>
@@ -784,6 +934,35 @@
             promptInput.disabled = isLoading;
         }
 
+        // 添加魔法星星效果
+        function createStars() {
+            const stars = document.getElementById('magicStars');
+            const count = 20;
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // 随机大小和位置
+                const size = Math.random() * 15 + 5;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.top = `${y}%`;
+                star.style.left = `${x}%`;
+                
+                // 随机延迟动画开始时间
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                stars.appendChild(star);
+            }
+        }
+        
+        // 创建星星
+        createStars();
+
         // 添加些CSS样式
         const style = document.createElement('style');
         style.textContent = `
@@ -805,6 +984,69 @@
                 0% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.7); }
                 70% { box-shadow: 0 0 0 10px rgba(138, 43, 226, 0); }
                 100% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0); }
+            }
+            
+            /* 添加更多动画效果 */
+            .upload-area:hover .upload-icon {
+                transform: scale(1.1) rotate(5deg);
+                filter: drop-shadow(0 0 5px rgba(138, 43, 226, 0.6));
+            }
+            
+            .example-btn {
+                background-image: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 107, 157, 0.1));
+                border: 1px solid rgba(138, 43, 226, 0.2);
+            }
+            
+            .example-btn:hover {
+                background-image: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 107, 157, 0.2));
+                transform: translateY(-2px) scale(1.05);
+                box-shadow: 0 5px 10px rgba(138, 43, 226, 0.2);
+            }
+            
+            @keyframes floatAnimation {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+            
+            .image-container {
+                position: relative;
+            }
+            
+            .image-container::after {
+                content: "";
+                position: absolute;
+                top: -10px;
+                left: -10px;
+                right: -10px;
+                bottom: -10px;
+                border-radius: 20px;
+                background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--primary-color));
+                background-size: 200% 200%;
+                z-index: -1;
+                filter: blur(20px);
+                opacity: 0;
+                transition: opacity 0.5s ease;
+                animation: gradientAnimation 6s ease infinite;
+            }
+            
+            .image-container:hover::after {
+                opacity: 0.5;
+            }
+            
+            @keyframes gradientAnimation {
+                0% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+                100% {
+                    background-position: 0% 50%;
+                }
             }
         `;
         document.head.appendChild(style);
