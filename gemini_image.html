@@ -7,17 +7,16 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
-            --primary-color: #8a2be2;
-            --primary-light: #a64dff;
-            --primary-dark: #6a0dad;
-            --accent-color: #ff6b9d;
-            --text-color: #2c2c3d;
-            --bg-color: #f6f8ff;
-            --card-bg: #ffffff;
-            --shadow: 0 8px 20px rgba(138, 43, 226, 0.1);
+            --primary-color: #FF9966;
+            --primary-light: #FFBB99;
+            --primary-dark: #FF7733;
+            --accent-color: #6699FF;
+            --text-color: #333333;
+            --bg-color: #FFF6EE;
+            --card-bg: #FFFFFF;
+            --shadow: 0 8px 20px rgba(255, 153, 102, 0.15);
             --gradient: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            --gradient-hover: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-            --border-radius: 16px;
+            --border-radius: 20px;
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         
@@ -36,15 +35,15 @@
             line-height: 1.6;
             min-height: 100vh;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.05) 0%, rgba(215, 215, 255, 0.1) 90%),
-                linear-gradient(45deg, rgba(255, 107, 157, 0.05) 0%, rgba(138, 43, 226, 0.05) 100%);
+                radial-gradient(circle at 10% 20%, rgba(255, 153, 102, 0.1) 0%, rgba(255, 235, 235, 0.15) 90%),
+                linear-gradient(45deg, rgba(255, 153, 102, 0.05) 0%, rgba(102, 153, 255, 0.05) 100%);
             background-attachment: fixed;
             animation: backgroundShimmer 15s infinite alternate;
             position: relative;
             overflow-x: hidden;
         }
         
-        /* 添加背景闪光粒子 */
+        /* 添加可爱的背景元素 */
         body::before {
             content: "";
             position: absolute;
@@ -53,8 +52,8 @@
             right: 0;
             bottom: 0;
             background-image: 
-                radial-gradient(circle at 30% 40%, rgba(255, 107, 157, 0.1) 0%, transparent 30%),
-                radial-gradient(circle at 70% 60%, rgba(138, 43, 226, 0.1) 0%, transparent 30%);
+                radial-gradient(circle at 30% 40%, rgba(255, 153, 102, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 70% 60%, rgba(102, 153, 255, 0.1) 0%, transparent 30%);
             z-index: -1;
             opacity: 0.7;
             animation: shimmer 15s infinite alternate;
@@ -84,17 +83,16 @@
         }
         
         .container {
-            max-width: 850px;
-            margin: 20px auto;
+            max-width: 1000px;
+            margin: 40px auto;
             background-color: var(--card-bg);
             border-radius: var(--border-radius);
-            box-shadow: var(--shadow), 0 0 30px rgba(255, 107, 157, 0.1);
-            padding: 35px;
+            box-shadow: var(--shadow);
+            padding: 40px;
             transition: var(--transition);
             overflow: hidden;
             position: relative;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 153, 102, 0.2);
             animation: containerFadeIn 1s ease-out;
         }
         
@@ -109,147 +107,216 @@
             }
         }
         
+        /* 添加猫爪印边框点缀 */
         .container::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 6px;
+            height: 8px;
             background: var(--gradient);
-            animation: rainbowShift 6s infinite linear;
             background-size: 200% 200%;
+            animation: gradientShift 6s infinite linear;
         }
         
-        @keyframes rainbowShift {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-        
-        /* 添加魔法星星效果 */
-        .magic-stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .star {
-            position: absolute;
-            background-image: radial-gradient(var(--primary-light) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: twinkle 4s infinite;
-            opacity: 0;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% {
-                opacity: 0;
-                transform: scale(0.1);
-            }
-            50% {
-                opacity: 0.7;
-                transform: scale(1);
-            }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         h1 {
-            margin-bottom: 30px;
+            font-size: 2.8rem;
             font-weight: 700;
-            letter-spacing: -0.5px;
-            text-align: center;
-            background-image: linear-gradient(135deg, #8a2be2, #ff6b9d, #8a2be2);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
             position: relative;
-            padding-bottom: 15px;
-            animation: shine 5s linear infinite;
-            text-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
+            display: inline-block;
+            text-align: center;
         }
         
-        @keyframes shine {
-            to {
-                background-position: 200% center;
-            }
-        }
-        
-        h1::after {
-            content: "";
+        /* 猫脚印动画 */
+        .paw-prints {
             position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: var(--gradient);
-            border-radius: 3px;
-            animation: pulse 2s infinite;
+            width: 100%;
+            height: 30px;
+            bottom: -20px;
+            display: flex;
+            justify-content: center;
         }
         
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(138, 43, 226, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(138, 43, 226, 0);
-            }
+        .paw {
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 153, 102, 0.2);
+            border-radius: 50%;
+            margin: 0 15px;
+            position: relative;
+            opacity: 0;
+            animation: pawFade 3s infinite;
+        }
+        
+        .paw::before,
+        .paw::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 153, 102, 0.2);
+            border-radius: 50%;
+        }
+        
+        .paw::before {
+            top: -5px;
+            left: -3px;
+        }
+        
+        .paw::after {
+            top: -5px;
+            right: -3px;
+        }
+        
+        .paw:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        
+        .paw:nth-child(3) {
+            animation-delay: 1s;
+        }
+        
+        .paw:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+        
+        .paw:nth-child(5) {
+            animation-delay: 2s;
+        }
+        
+        @keyframes pawFade {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .cat-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            animation: catBounce 2s infinite;
+        }
+        
+        @keyframes catBounce {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-5px) rotate(5deg); }
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 153, 102, 0.3);
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* 返回首页按钮样式 */
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px 10px 16px;
+            background: var(--card-bg);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(255, 153, 102, 0.15);
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 153, 102, 0.2);
+            overflow: hidden;
+        }
+        
+        .home-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 153, 102, 0.25);
+        }
+        
+        .home-button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 153, 102, 0.15);
+        }
+        
+        .home-button i {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .home-button:hover i {
+            transform: translateX(-3px);
         }
         
         /* 上传区域样式 */
         .upload-area {
-            border: 2px dashed rgba(138, 43, 226, 0.3);
+            border: 2px dashed rgba(255, 153, 102, 0.3);
             border-radius: var(--border-radius);
             padding: 25px;
             text-align: center;
             margin-bottom: 30px;
             transition: var(--transition);
             cursor: pointer;
-            background-color: rgba(138, 43, 226, 0.02);
+            background-color: rgba(255, 153, 102, 0.02);
             position: relative;
             overflow: hidden;
         }
         
         .upload-area:hover {
             border-color: var(--primary-color);
-            background-color: rgba(138, 43, 226, 0.05);
+            background-color: rgba(255, 153, 102, 0.05);
             transform: translateY(-3px);
         }
         
         .upload-area.dragover {
             border-color: var(--primary-color);
-            background-color: rgba(138, 43, 226, 0.1);
+            background-color: rgba(255, 153, 102, 0.1);
             transform: scale(1.01);
         }
         
         .upload-icon {
             font-size: 48px;
             margin-bottom: 15px;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: var(--primary-color);
             transition: var(--transition);
         }
         
         .upload-area:hover .upload-icon {
             transform: scale(1.1) rotate(5deg);
-            filter: drop-shadow(0 0 5px rgba(138, 43, 226, 0.6));
+            filter: drop-shadow(0 0 5px rgba(255, 153, 102, 0.6));
         }
         
         .upload-text {
@@ -273,7 +340,7 @@
             display: inline-block;
             margin: 5px 5px 5px 0;
             padding: 8px 16px;
-            background-color: rgba(138, 43, 226, 0.1);
+            background-color: rgba(255, 153, 102, 0.1);
             color: var(--primary-color);
             border: none;
             border-radius: 30px;
@@ -281,88 +348,13 @@
             font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
-            box-shadow: 0 2px 5px rgba(138, 43, 226, 0.1);
+            box-shadow: 0 2px 5px rgba(255, 153, 102, 0.1);
         }
         
         .example-btn:hover {
-            background-image: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 107, 157, 0.2));
+            background-image: linear-gradient(135deg, rgba(255, 153, 102, 0.2), rgba(102, 153, 255, 0.2));
             transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 5px 10px rgba(138, 43, 226, 0.2);
-        }
-        
-        /* 返回首页按钮样式 */
-        .home-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 18px 10px 16px;
-            background: var(--card-bg);
-            color: var(--primary-color);
-            border: none;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.15);
-            z-index: 100;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(138, 43, 226, 0.2);
-            overflow: hidden;
-        }
-        
-        .home-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: -1;
-        }
-        
-        .home-button:hover {
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.25);
-        }
-        
-        .home-button:hover::before {
-            opacity: 1;
-        }
-        
-        .home-button:active {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(138, 43, 226, 0.15);
-        }
-        
-        .home-button i {
-            font-size: 18px;
-            transition: transform 0.3s ease;
-        }
-        
-        .home-button:hover i {
-            transform: translateX(-3px);
-        }
-        
-        @keyframes floatButton {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-5px);
-            }
-        }
-        
-        .home-button.float {
-            animation: floatButton 4s ease-in-out infinite;
+            box-shadow: 0 5px 10px rgba(255, 153, 102, 0.2);
         }
         
         /* 上传图片展示区域 */
@@ -407,7 +399,7 @@
             width: 28px;
             height: 28px;
             background-color: rgba(255, 255, 255, 0.9);
-            color: #ff3366;
+            color: #ff6666;
             border: none;
             border-radius: 50%;
             display: flex;
@@ -426,7 +418,7 @@
         }
         
         .image-delete-btn:hover {
-            background-color: #ff3366;
+            background-color: #ff6666;
             color: white;
             transform: rotate(90deg);
         }
@@ -438,7 +430,7 @@
             font-style: normal;
             display: none;
             font-weight: 500;
-            background-color: rgba(138, 43, 226, 0.05);
+            background-color: rgba(255, 153, 102, 0.05);
             padding: 8px 15px;
             border-radius: 8px;
         }
@@ -451,7 +443,7 @@
         #promptInput {
             width: 100%;
             padding: 15px 18px;
-            border: 2px solid rgba(138, 43, 226, 0.2);
+            border: 2px solid rgba(255, 153, 102, 0.2);
             border-radius: 12px;
             font-size: 16px;
             transition: var(--transition);
@@ -463,7 +455,7 @@
         #promptInput:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 153, 102, 0.2);
             background-color: white;
         }
         
@@ -486,7 +478,7 @@
             font-size: 16px;
             font-weight: 600;
             transition: all 0.4s ease;
-            box-shadow: 0 6px 15px rgba(138, 43, 226, 0.3);
+            box-shadow: 0 6px 15px rgba(255, 153, 102, 0.3);
             position: relative;
             overflow: hidden;
             letter-spacing: 0.5px;
@@ -494,244 +486,163 @@
             transform-style: preserve-3d;
         }
         
-        #generateButton::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: all 0.4s;
-            z-index: -1;
-        }
-        
-        #generateButton::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 100%;
-            background: var(--gradient-hover);
-            opacity: 0;
-            transition: all 0.4s;
-            z-index: -2;
-        }
-        
         #generateButton:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.5);
-            letter-spacing: 1px;
-        }
-        
-        #generateButton:hover::before {
-            left: 100%;
-        }
-        
-        #generateButton:hover::after {
-            opacity: 1;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 153, 102, 0.4);
         }
         
         #generateButton:active {
-            transform: translateY(0) scale(0.98);
-            box-shadow: 0 4px 10px rgba(138, 43, 226, 0.25);
+            transform: translateY(-1px) scale(1.02);
         }
         
-        #generateButton:disabled {
-            background: linear-gradient(135deg, #c9c9c9, #a0a0a0);
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        
-        #status {
-            margin: 20px 0;
-            color: var(--text-color);
-            font-weight: 500;
-            min-height: 24px;
-            text-align: center;
-            transition: var(--transition);
-        }
-        
-        .loader {
+        /* 加载动画 */
+        .loading-animation {
             display: none;
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(138, 43, 226, 0.1);
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 153, 102, 0.2);
             border-radius: 50%;
             border-top-color: var(--primary-color);
-            animation: spin 0.8s linear infinite;
-            margin: 10px auto;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 15px;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        .image-container {
+        .loading-text {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        /* 结果图像样式 */
+        .result-container {
             margin-top: 30px;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
+            display: none;
+        }
+        
+        .result-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .result-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .result-image-wrapper {
             position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            aspect-ratio: 1/1;
+        }
+        
+        .result-image-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 153, 102, 0.2);
+        }
+        
+        .result-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             transition: var(--transition);
         }
         
-        .image-container::before {
-            content: "✨ AI生成图像";
+        .result-image-wrapper:hover .result-image {
+            transform: scale(1.05);
+        }
+        
+        .download-btn {
             position: absolute;
-            top: 10px;
+            bottom: 10px;
             right: 10px;
-            background: var(--gradient);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            z-index: 10;
-            opacity: 0.9;
-        }
-        
-        .image-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-        }
-        
-        #resultImage {
-            max-width: 100%;
-            display: block;
-            margin: 0 auto;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
-        
-        #resultImage.show {
-            opacity: 1;
-        }
-        
-        .error {
-            color: #ff3366;
-            font-weight: 500;
-            background-color: rgba(255, 51, 102, 0.1);
-            padding: 8px 15px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-        
-        .success {
-            color: #00c853;
-            font-weight: 500;
-            background-color: rgba(0, 200, 83, 0.1);
-            padding: 8px 15px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-
-        /* 更可爱的错误提示 */
-        .error-kawaii {
-            color: #ff3366;
-            font-weight: 500;
-            background-color: rgba(255, 51, 102, 0.1);
-            padding: 12px 20px;
-            border-radius: 12px;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(255, 51, 102, 0.2);
-            border: 1px dashed #ff6b9d;
-            animation: heartbeat 1.5s ease-in-out infinite;
-            margin: 10px 0;
-        }
-        
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-        }
-
-        /* AI文本回复区域 */
-        .ai-message-container {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: rgba(138, 43, 226, 0.05);
-            border-radius: var(--border-radius);
-            border-left: 3px solid var(--primary-color);
-            position: relative;
-            transition: all 0.5s ease;
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            box-shadow: 0 4px 10px rgba(138, 43, 226, 0.1);
-        }
-        
-        .ai-message-container.show {
-            max-height: 300px;
-            opacity: 1;
-            margin-bottom: 20px;
-            padding: 20px 15px 15px;
-        }
-        
-        .ai-message-container::before {
-            content: "🤖 AI说";
-            position: absolute;
-            top: -10px;
-            left: 15px;
-            background: var(--card-bg);
+            background-color: rgba(255, 255, 255, 0.9);
             color: var(--primary-color);
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(138, 43, 226, 0.1);
-            z-index: 1;
-            animation: float 2s ease-in-out infinite;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-3px);
-            }
+        .result-image-wrapper:hover .download-btn {
+            opacity: 1;
         }
         
-        .ai-message {
-            font-size: 0.95em;
-            line-height: 1.6;
-            color: var(--text-color);
+        .download-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
         }
-
+        
+        /* 响应式调整 */
         @media (max-width: 768px) {
             .container {
                 padding: 25px 15px;
             }
             
             h1 {
-                font-size: 1.8rem;
+                font-size: 2.2rem;
             }
             
-            .image-preview-wrapper {
-                width: 130px;
-                height: 130px;
+            .result-images {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
-            
-            #generateButton {
-                width: 100%;
-            }
+        }
+        
+        /* 错误提示样式 */
+        .error-message {
+            background-color: #ffeeee;
+            color: #ff5555;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ff5555;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- 添加魔法星星背景 -->
-    <div class="magic-stars" id="magicStars"></div>
-    
     <!-- 添加返回首页按钮 -->
-    <a href="/" class="home-button float" id="homeButton">
+    <a href="index.html" class="home-button">
         <i>🏠</i>
         <span>返回首页</span>
     </a>
     
     <div class="container">
-        <h1>✨ Gemini 魔法图像工坊 ✨</h1>
+        <div class="header">
+            <div class="cat-icon">🐱</div>
+            <h1 class="title">Gemini 魔法图像工坊</h1>
+            <p class="subtitle">一只懒橘猫的神奇魔法工具～</p>
+            <div class="paw-prints">
+                <div class="paw"></div>
+                <div class="paw"></div>
+                <div class="paw"></div>
+                <div class="paw"></div>
+                <div class="paw"></div>
+            </div>
+        </div>
         
         <div class="upload-area" id="uploadArea">
             <div class="upload-icon">🖼️</div>
@@ -740,7 +651,7 @@
             <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
         </div>
         
-        <div class="safety-tips" style="margin-bottom: 20px; font-size: 0.85em; color: #8a2be2; text-align: center; padding: 8px; background-color: rgba(138, 43, 226, 0.05); border-radius: 8px;">
+        <div class="safety-tips" style="margin-bottom: 20px; font-size: 0.85em; color: var(--primary-color); text-align: center; padding: 8px; background-color: rgba(255, 153, 102, 0.05); border-radius: 8px;">
             💫 小提示：避免使用可能包含敏感内容的图片或提示词，以防触发安全系统拦截 ✨
         </div>
         
@@ -755,7 +666,7 @@
                     <span>使用魔法优化✨</span>
                     <span class="tooltip" style="position: relative; margin-left: 5px; cursor: help;">
                         ℹ️
-                        <span class="tooltip-text" style="visibility: hidden; position: absolute; width: 250px; background-color: rgba(138, 43, 226, 0.9); color: white; text-align: center; padding: 8px; border-radius: 6px; z-index: 1; bottom: 125%; left: 50%; margin-left: -125px; opacity: 0; transition: opacity 0.3s; font-weight: normal;">
+                        <span class="tooltip-text" style="visibility: hidden; position: absolute; width: 250px; background-color: rgba(255, 153, 102, 0.9); color: white; text-align: center; padding: 8px; border-radius: 6px; z-index: 1; bottom: 125%; left: 50%; margin-left: -125px; opacity: 0; transition: opacity 0.3s; font-weight: normal;">
                             自动优化提示词，提高生成成功率～添加适当的前缀和后缀哦～
                         </span>
                     </span>
@@ -780,6 +691,11 @@
         </div>
         <div class="ai-message-container" id="aiMessageContainer">
             <div class="ai-message" id="aiMessage"></div>
+        </div>
+        
+        <div class="footer">
+            <p>🐾 橘猫の魔法工坊 · 2024 🐾</p>
+            <p style="font-size: 0.8rem; margin-top: 5px;">猫咪正在努力添加更多有趣的小玩具～</p>
         </div>
     </div>
 
@@ -1300,18 +1216,18 @@
             /* 添加更多动画效果 */
             .upload-area:hover .upload-icon {
                 transform: scale(1.1) rotate(5deg);
-                filter: drop-shadow(0 0 5px rgba(138, 43, 226, 0.6));
+                filter: drop-shadow(0 0 5px rgba(255, 153, 102, 0.6));
             }
             
             .example-btn {
-                background-image: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 107, 157, 0.1));
-                border: 1px solid rgba(138, 43, 226, 0.2);
+                background-image: linear-gradient(135deg, rgba(255, 153, 102, 0.1), rgba(102, 153, 255, 0.1));
+                border: 1px solid rgba(255, 153, 102, 0.2);
             }
             
             .example-btn:hover {
-                background-image: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 107, 157, 0.2));
+                background-image: linear-gradient(135deg, rgba(255, 153, 102, 0.2), rgba(102, 153, 255, 0.2));
                 transform: translateY(-2px) scale(1.05);
-                box-shadow: 0 5px 10px rgba(138, 43, 226, 0.2);
+                box-shadow: 0 5px 10px rgba(255, 153, 102, 0.2);
             }
             
             .example-btn:hover::before {
