@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini 2.0 Flash 图像生成</title>
+    <title>橘猫的小玩具</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
-            --primary-color: #8a2be2;
-            --primary-light: #a64dff;
-            --primary-dark: #6a0dad;
-            --accent-color: #ff6b9d;
-            --text-color: #2c2c3d;
-            --bg-color: #f6f8ff;
-            --card-bg: #ffffff;
-            --shadow: 0 8px 20px rgba(138, 43, 226, 0.1);
+            --primary-color: #FF9966;
+            --primary-light: #FFBB99;
+            --primary-dark: #FF7733;
+            --accent-color: #6699FF;
+            --text-color: #333333;
+            --bg-color: #FFF6EE;
+            --card-bg: #FFFFFF;
+            --shadow: 0 8px 20px rgba(255, 153, 102, 0.15);
             --gradient: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            --gradient-hover: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-            --border-radius: 16px;
+            --border-radius: 20px;
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         
@@ -36,15 +35,15 @@
             line-height: 1.6;
             min-height: 100vh;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.05) 0%, rgba(215, 215, 255, 0.1) 90%),
-                linear-gradient(45deg, rgba(255, 107, 157, 0.05) 0%, rgba(138, 43, 226, 0.05) 100%);
+                radial-gradient(circle at 10% 20%, rgba(255, 153, 102, 0.1) 0%, rgba(255, 235, 235, 0.15) 90%),
+                linear-gradient(45deg, rgba(255, 153, 102, 0.05) 0%, rgba(102, 153, 255, 0.05) 100%);
             background-attachment: fixed;
             animation: backgroundShimmer 15s infinite alternate;
             position: relative;
             overflow-x: hidden;
         }
         
-        /* 添加背景闪光粒子 */
+        /* 添加可爱的背景元素 */
         body::before {
             content: "";
             position: absolute;
@@ -53,8 +52,8 @@
             right: 0;
             bottom: 0;
             background-image: 
-                radial-gradient(circle at 30% 40%, rgba(255, 107, 157, 0.1) 0%, transparent 30%),
-                radial-gradient(circle at 70% 60%, rgba(138, 43, 226, 0.1) 0%, transparent 30%);
+                radial-gradient(circle at 30% 40%, rgba(255, 153, 102, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 70% 60%, rgba(102, 153, 255, 0.1) 0%, transparent 30%);
             z-index: -1;
             opacity: 0.7;
             animation: shimmer 15s infinite alternate;
@@ -84,17 +83,16 @@
         }
         
         .container {
-            max-width: 850px;
-            margin: 20px auto;
+            max-width: 1000px;
+            margin: 40px auto;
             background-color: var(--card-bg);
             border-radius: var(--border-radius);
-            box-shadow: var(--shadow), 0 0 30px rgba(255, 107, 157, 0.1);
-            padding: 35px;
+            box-shadow: var(--shadow);
+            padding: 40px;
             transition: var(--transition);
             overflow: hidden;
             position: relative;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 153, 102, 0.2);
             animation: containerFadeIn 1s ease-out;
         }
         
@@ -109,1336 +107,353 @@
             }
         }
         
+        /* 添加猫爪印边框点缀 */
         .container::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 6px;
+            height: 8px;
             background: var(--gradient);
-            animation: rainbowShift 6s infinite linear;
             background-size: 200% 200%;
+            animation: gradientShift 6s infinite linear;
         }
         
-        @keyframes rainbowShift {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
-        /* 添加魔法星星效果 */
-        .magic-stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
         }
         
-        .star {
-            position: absolute;
-            background-image: radial-gradient(var(--primary-light) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: twinkle 4s infinite;
-            opacity: 0;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% {
-                opacity: 0;
-                transform: scale(0.1);
-            }
-            50% {
-                opacity: 0.7;
-                transform: scale(1);
-            }
-        }
-        
-        h1 {
-            margin-bottom: 30px;
+        .title {
+            font-size: 2.8rem;
             font-weight: 700;
-            letter-spacing: -0.5px;
-            text-align: center;
-            background-image: linear-gradient(135deg, #8a2be2, #ff6b9d, #8a2be2);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 2.5rem;
-            position: relative;
-            padding-bottom: 15px;
-            animation: shine 5s linear infinite;
-            text-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
-        }
-        
-        @keyframes shine {
-            to {
-                background-position: 200% center;
-            }
-        }
-        
-        h1::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: var(--gradient);
-            border-radius: 3px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(138, 43, 226, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(138, 43, 226, 0);
-            }
-        }
-        
-        /* 上传区域样式 */
-        .upload-area {
-            border: 2px dashed rgba(138, 43, 226, 0.3);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            text-align: center;
-            margin-bottom: 30px;
-            transition: var(--transition);
-            cursor: pointer;
-            background-color: rgba(138, 43, 226, 0.02);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .upload-area:hover {
-            border-color: var(--primary-color);
-            background-color: rgba(138, 43, 226, 0.05);
-            transform: translateY(-3px);
-        }
-        
-        .upload-area.dragover {
-            border-color: var(--primary-color);
-            background-color: rgba(138, 43, 226, 0.1);
-            transform: scale(1.01);
-        }
-        
-        .upload-icon {
-            font-size: 48px;
             margin-bottom: 15px;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            transition: var(--transition);
-        }
-        
-        .upload-area:hover .upload-icon {
-            transform: scale(1.1) rotate(5deg);
-            filter: drop-shadow(0 0 5px rgba(138, 43, 226, 0.6));
-        }
-        
-        .upload-text {
-            color: var(--text-color);
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-        
-        .small {
-            font-size: 0.85em;
-            color: #888;
-            font-weight: 400;
-        }
-        
-        /* 示例提示按钮样式 */
-        .example-prompts {
-            margin: 15px 0 25px;
-        }
-        
-        .example-btn {
+            color: var(--primary-color);
+            position: relative;
             display: inline-block;
-            margin: 5px 5px 5px 0;
-            padding: 8px 16px;
-            background-color: rgba(138, 43, 226, 0.1);
-            color: var(--primary-color);
-            border: none;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 2px 5px rgba(138, 43, 226, 0.1);
         }
         
-        .example-btn:hover {
-            background-image: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 107, 157, 0.2));
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 5px 10px rgba(138, 43, 226, 0.2);
-        }
-        
-        /* 上传图片展示区域 */
-        .uploaded-images-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 20px 0;
-            justify-content: center;
-        }
-        
-        .image-preview-wrapper {
-            position: relative;
-            width: 160px;
-            height: 160px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: var(--transition);
-        }
-        
-        .image-preview-wrapper:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        
-        .image-preview {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-        
-        .image-preview-wrapper:hover .image-preview {
-            transform: scale(1.05);
-        }
-        
-        .image-delete-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 28px;
-            height: 28px;
-            background-color: rgba(255, 255, 255, 0.9);
-            color: #ff3366;
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: var(--transition);
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .image-preview-wrapper:hover .image-delete-btn {
-            opacity: 1;
-        }
-        
-        .image-delete-btn:hover {
-            background-color: #ff3366;
-            color: white;
-            transform: rotate(90deg);
-        }
-        
-        .upload-hint {
-            text-align: center;
-            margin: 15px 0;
-            color: var(--primary-color);
-            font-style: normal;
-            display: none;
-            font-weight: 500;
-            background-color: rgba(138, 43, 226, 0.05);
-            padding: 8px 15px;
-            border-radius: 8px;
-        }
-        
-        .input-group {
-            margin-bottom: 25px;
-            position: relative;
-        }
-        
-        #promptInput {
-            width: 100%;
-            padding: 15px 18px;
-            border: 2px solid rgba(138, 43, 226, 0.2);
-            border-radius: 12px;
-            font-size: 16px;
-            transition: var(--transition);
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-        
-        #promptInput:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
-            background-color: white;
-        }
-        
-        #promptInput::placeholder {
-            color: #aaa;
-        }
-        
-        .button-container {
-            display: flex;
-            justify-content: center;
-        }
-        
-        #generateButton {
-            padding: 14px 35px;
-            background: var(--gradient);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.4s ease;
-            box-shadow: 0 6px 15px rgba(138, 43, 226, 0.3);
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.5px;
-            z-index: 1;
-            transform-style: preserve-3d;
-        }
-        
-        #generateButton::before {
+        /* 添加猫耳朵装饰 */
+        .title::before,
+        .title::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: all 0.4s;
+            top: -15px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 50% 50% 0 0;
             z-index: -1;
         }
         
-        #generateButton::after {
-            content: "";
+        .title::before {
+            left: -15px;
+            transform: rotate(-30deg);
+        }
+        
+        .title::after {
+            right: -15px;
+            transform: rotate(30deg);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        /* 猫脚印动画 */
+        .paw-prints {
             position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
             width: 100%;
-            background: var(--gradient-hover);
-            opacity: 0;
-            transition: all 0.4s;
-            z-index: -2;
+            height: 30px;
+            bottom: -20px;
+            display: flex;
+            justify-content: center;
         }
         
-        #generateButton:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.5);
-            letter-spacing: 1px;
-        }
-        
-        #generateButton:hover::before {
-            left: 100%;
-        }
-        
-        #generateButton:hover::after {
-            opacity: 1;
-        }
-        
-        #generateButton:active {
-            transform: translateY(0) scale(0.98);
-            box-shadow: 0 4px 10px rgba(138, 43, 226, 0.25);
-        }
-        
-        #generateButton:disabled {
-            background: linear-gradient(135deg, #c9c9c9, #a0a0a0);
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        
-        #status {
-            margin: 20px 0;
-            color: var(--text-color);
-            font-weight: 500;
-            min-height: 24px;
-            text-align: center;
-            transition: var(--transition);
-        }
-        
-        .loader {
-            display: none;
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(138, 43, 226, 0.1);
+        .paw {
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 153, 102, 0.2);
             border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 0.8s linear infinite;
-            margin: 10px auto;
+            margin: 0 15px;
+            position: relative;
+            opacity: 0;
+            animation: pawFade 3s infinite;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .paw::before,
+        .paw::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 153, 102, 0.2);
+            border-radius: 50%;
         }
         
-        .image-container {
+        .paw::before {
+            top: -5px;
+            left: -3px;
+        }
+        
+        .paw::after {
+            top: -5px;
+            right: -3px;
+        }
+        
+        .paw:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        
+        .paw:nth-child(3) {
+            animation-delay: 1s;
+        }
+        
+        .paw:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+        
+        .paw:nth-child(5) {
+            animation-delay: 2s;
+        }
+        
+        @keyframes pawFade {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
+        /* 工具卡片容器 */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
             margin-top: 30px;
+        }
+        
+        .tool-card {
+            background-color: white;
             border-radius: var(--border-radius);
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: var(--transition);
             position: relative;
+            border: 2px solid rgba(255, 153, 102, 0.2);
+            display: flex;
+            flex-direction: column;
+            height: 280px;
+            cursor: pointer;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(255, 153, 102, 0.2);
+            border-color: var(--primary-color);
+        }
+        
+        .tool-card:hover .tool-icon {
+            transform: translateY(-5px) scale(1.1);
+        }
+        
+        .tool-card:hover .card-content h3 {
+            color: var(--primary-color);
+        }
+        
+        .tool-icon-container {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #FFF6EE 0%, #FFEBE5 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tool-icon {
+            font-size: 4rem;
+            transition: var(--transition);
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* 卡片背景的小猫爪图案 */
+        .tool-icon-container::before {
+            content: "🐾";
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            right: 10px;
+            bottom: 10px;
+            transform: rotate(15deg);
+        }
+        
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
             transition: var(--transition);
         }
         
-        .image-container::before {
-            content: "✨ AI生成图像";
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--gradient);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            z-index: 10;
-            opacity: 0.9;
+        .card-content p {
+            font-size: 0.9rem;
+            color: #777;
+            flex-grow: 1;
         }
         
-        .image-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        .tool-tags {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
         }
         
-        #resultImage {
-            max-width: 100%;
-            display: block;
-            margin: 0 auto;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
-        
-        #resultImage.show {
-            opacity: 1;
-        }
-        
-        .error {
-            color: #ff3366;
-            font-weight: 500;
-            background-color: rgba(255, 51, 102, 0.1);
-            padding: 8px 15px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-        
-        .success {
-            color: #00c853;
-            font-weight: 500;
-            background-color: rgba(0, 200, 83, 0.1);
-            padding: 8px 15px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-
-        /* 更可爱的错误提示 */
-        .error-kawaii {
-            color: #ff3366;
-            font-weight: 500;
-            background-color: rgba(255, 51, 102, 0.1);
-            padding: 12px 20px;
-            border-radius: 12px;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(255, 51, 102, 0.2);
-            border: 1px dashed #ff6b9d;
-            animation: heartbeat 1.5s ease-in-out infinite;
-            margin: 10px 0;
-        }
-        
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-        }
-
-        /* AI文本回复区域 */
-        .ai-message-container {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: rgba(138, 43, 226, 0.05);
-            border-radius: var(--border-radius);
-            border-left: 3px solid var(--primary-color);
-            position: relative;
-            transition: all 0.5s ease;
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            box-shadow: 0 4px 10px rgba(138, 43, 226, 0.1);
-        }
-        
-        .ai-message-container.show {
-            max-height: 300px;
-            opacity: 1;
-            margin-bottom: 20px;
-            padding: 20px 15px 15px;
-        }
-        
-        .ai-message-container::before {
-            content: "🤖 AI说";
-            position: absolute;
-            top: -10px;
-            left: 15px;
-            background: var(--card-bg);
+        .tag {
+            padding: 4px 10px;
+            background-color: rgba(255, 153, 102, 0.1);
             color: var(--primary-color);
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(138, 43, 226, 0.1);
-            z-index: 1;
-            animation: float 2s ease-in-out infinite;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
         }
         
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-3px);
-            }
+        /* 底部署名 */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 153, 102, 0.3);
+            color: #888;
+            font-size: 0.9rem;
         }
         
-        .ai-message {
-            font-size: 0.95em;
-            line-height: 1.6;
-            color: var(--text-color);
-        }
-
+        /* 响应式调整 */
         @media (max-width: 768px) {
             .container {
                 padding: 25px 15px;
             }
             
-            h1 {
-                font-size: 1.8rem;
+            .title {
+                font-size: 2.2rem;
             }
             
-            .image-preview-wrapper {
-                width: 130px;
-                height: 130px;
+            .tools-grid {
+                grid-template-columns: 1fr;
             }
-            
-            #generateButton {
-                width: 100%;
-            }
+        }
+        
+        /* 添加一些动画元素 */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* 猫咪图标 */
+        .cat-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            animation: catBounce 2s infinite;
+        }
+        
+        @keyframes catBounce {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-5px) rotate(5deg); }
         }
     </style>
 </head>
 <body>
-    <!-- 添加魔法星星背景 -->
-    <div class="magic-stars" id="magicStars"></div>
-    
     <div class="container">
-        <h1>✨ Gemini 魔法图像工坊 ✨</h1>
-        
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">🖼️</div>
-            <div class="upload-text">点击或拖拽图片到这里上传</div>
-            <div class="upload-text small">(支持多张图片) 上传图片进行魔法变换</div>
-            <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
-        </div>
-        
-        <div class="safety-tips" style="margin-bottom: 20px; font-size: 0.85em; color: #8a2be2; text-align: center; padding: 8px; background-color: rgba(138, 43, 226, 0.05); border-radius: 8px;">
-            💫 小提示：避免使用可能包含敏感内容的图片或提示词，以防触发安全系统拦截 ✨
-        </div>
-        
-        <div class="uploaded-images-container" id="uploadedImagesContainer"></div>
-        <div class="upload-hint" id="uploadHint">✨ 点击图片可选择要处理的主图片</div>
-        
-        <div class="input-group">
-            <input type="text" id="promptInput" placeholder="输入你的创意指令（英文效果最佳）" />
-            <div class="prompt-optimization" style="margin-top: 10px; display: flex; align-items: center; justify-content: flex-end;">
-                <label for="useOptimization" style="font-size: 0.85em; display: flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" id="useOptimization" checked style="margin-right: 5px;">
-                    <span>使用魔法优化✨</span>
-                    <span class="tooltip" style="position: relative; margin-left: 5px; cursor: help;">
-                        ℹ️
-                        <span class="tooltip-text" style="visibility: hidden; position: absolute; width: 250px; background-color: rgba(138, 43, 226, 0.9); color: white; text-align: center; padding: 8px; border-radius: 6px; z-index: 1; bottom: 125%; left: 50%; margin-left: -125px; opacity: 0; transition: opacity 0.3s; font-weight: normal;">
-                            自动优化提示词，提高生成成功率～添加适当的前缀和后缀哦～
-                        </span>
-                    </span>
-                </label>
-            </div>
-            <div class="example-prompts">
-                <div class="small">灵感提示:</div>
-                <button class="example-btn" data-prompt="A cute cat in space">太空猫咪</button>
-                <button class="example-btn" data-prompt="Beautiful sunset over mountains">山间日落</button>
-                <button class="example-btn" data-prompt="Futuristic city with flying cars">未来城市</button>
-                <button class="example-btn" data-prompt="Underwater world with colorful fish">海底世界</button>
-                <button class="example-btn" data-prompt="Fantasy forest with glowing plants">魔法森林</button>
+        <div class="header">
+            <div class="cat-icon">🐱</div>
+            <h1 class="title">橘猫的小玩具</h1>
+            <p class="subtitle">一只懒橘猫的神奇工具箱~</p>
+            <div class="paw-prints">
+                <div class="paw"></div>
+                <div class="paw"></div>
+                <div class="paw"></div>
+                <div class="paw"></div>
+                <div class="paw"></div>
             </div>
         </div>
-        <div class="button-container">
-            <button id="generateButton">✨ 生成魔法图像</button>
+        
+        <div class="tools-grid">
+            <!-- Gemini 图像生成工具 -->
+            <a href="gemini_image.html" class="tool-card">
+                <div class="tool-icon-container">
+                    <div class="tool-icon">✨</div>
+                </div>
+                <div class="card-content">
+                    <h3>Gemini 魔法图像工坊</h3>
+                    <p>使用 Gemini 2.0 Flash 模型生成各种神奇的图像，满足你的创意想象～</p>
+                    <div class="tool-tags">
+                        <span class="tag">AI生成</span>
+                        <span class="tag">图像创作</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- 更多工具卡片将在这里添加 -->
+            <div class="tool-card" style="opacity: 0.6; cursor: not-allowed;">
+                <div class="tool-icon-container">
+                    <div class="tool-icon">🔮</div>
+                </div>
+                <div class="card-content">
+                    <h3>敬请期待...</h3>
+                    <p>懒猫正在打盹，新工具开发中～</p>
+                    <div class="tool-tags">
+                        <span class="tag">开发中</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="loader" id="loader"></div>
-        <div id="status"></div>
-        <div class="image-container" id="imageContainer" style="display: none;">
-            <img id="resultImage" src="" alt="生成的图像" />
-        </div>
-        <div class="ai-message-container" id="aiMessageContainer">
-            <div class="ai-message" id="aiMessage"></div>
+        
+        <div class="footer">
+            <p>🐾 橘猫の魔法工坊 · 2024 🐾</p>
+            <p style="font-size: 0.8rem; margin-top: 5px;">猫咪正在努力添加更多有趣的小玩具～</p>
         </div>
     </div>
-
+    
     <script>
-        // API密钥
-        const API_KEY = "AIzaSyDirHd3nwnsiKx7_1eBdm4RUX8T_6TMfz8";
-        
-        // 获取DOM元素
-        const promptInput = document.getElementById("promptInput");
-        const generateButton = document.getElementById("generateButton");
-        const status = document.getElementById("status");
-        const resultImage = document.getElementById("resultImage");
-        const imageContainer = document.getElementById("imageContainer");
-        const loader = document.getElementById("loader");
-        const uploadArea = document.getElementById("uploadArea");
-        const imageInput = document.getElementById("imageInput");
-        const uploadedImagesContainer = document.getElementById("uploadedImagesContainer");
-        const uploadHint = document.getElementById("uploadHint");
-        const exampleButtons = document.querySelectorAll(".example-btn");
-        const useOptimization = document.getElementById("useOptimization");
-        const tooltip = document.querySelector(".tooltip");
-        const aiMessageContainer = document.getElementById("aiMessageContainer");
-        const aiMessage = document.getElementById("aiMessage");
-        
-        // 存储上传的图片
-        let uploadedImages = [];
-        let selectedImageIndex = -1; // 当前选中的图片索引
-        
-        // 添加工具提示显示/隐藏逻辑
-        if (tooltip) {
-            tooltip.addEventListener("mouseenter", function() {
-                const tooltipText = this.querySelector(".tooltip-text");
-                tooltipText.style.visibility = "visible";
-                tooltipText.style.opacity = "1";
-            });
-            
-            tooltip.addEventListener("mouseleave", function() {
-                const tooltipText = this.querySelector(".tooltip-text");
-                tooltipText.style.visibility = "hidden";
-                tooltipText.style.opacity = "0";
-            });
-        }
-        
-        // 页面加载完成动画
+        // 添加一些简单的交互效果
         document.addEventListener('DOMContentLoaded', () => {
+            // 页面加载动画
             document.querySelector('.container').style.opacity = '0';
             setTimeout(() => {
                 document.querySelector('.container').style.opacity = '1';
                 document.querySelector('.container').style.transition = 'opacity 0.8s ease';
             }, 100);
-        });
-        
-        // 示例提示按钮事件
-        exampleButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                promptInput.value = button.getAttribute("data-prompt");
-                // 聚焦输入框
-                promptInput.focus();
-                // 添加动画效果
-                button.classList.add('active');
-                setTimeout(() => button.classList.remove('active'), 300);
-            });
-        });
-        
-        // 添加回车键触发生成
-        promptInput.addEventListener("keyup", (event) => {
-            if (event.key === "Enter") {
-                generateImage();
-            }
-        });
-        
-        // 绑定按钮点击事件
-        generateButton.addEventListener("click", generateImage);
-        
-        // 图像加载完成事件
-        resultImage.addEventListener("load", () => {
-            resultImage.classList.add("show");
-        });
-        
-        // 上传区域事件
-        uploadArea.addEventListener("dragover", (event) => {
-            event.preventDefault();
-            uploadArea.classList.add("dragover");
-        });
-        
-        uploadArea.addEventListener("dragleave", () => {
-            uploadArea.classList.remove("dragover");
-        });
-        
-        uploadArea.addEventListener("drop", (event) => {
-            event.preventDefault();
-            uploadArea.classList.remove("dragover");
-            const files = event.dataTransfer.files;
-            handleMultipleImageUpload(files);
-        });
-        
-        uploadArea.addEventListener("click", () => {
-            imageInput.click();
-            // 添加点击动画
-            uploadArea.classList.add('active');
-            setTimeout(() => uploadArea.classList.remove('active'), 300);
-        });
-        
-        imageInput.addEventListener("change", () => {
-            const files = imageInput.files;
-            handleMultipleImageUpload(files);
-        });
-        
-        // 处理多图片上传
-        function handleMultipleImageUpload(files) {
-            if (!files || files.length === 0) return;
             
-            // 处理每个文件
-            Array.from(files).forEach(file => {
-                if (!file.type.match('image.*')) {
-                    showStatus(`文件 "${file.name}" 不是有效的图片`, "error");
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageData = {
-                        id: Date.now() + Math.random().toString(36).substr(2, 9),
-                        name: file.name,
-                        src: e.target.result,
-                        base64: e.target.result.split(',')[1]
-                    };
-                    
-                    // 添加到图片数组
-                    uploadedImages.push(imageData);
-                    
-                    // 如果是第一张图片，自动选中
-                    if (uploadedImages.length === 1) {
-                        selectedImageIndex = 0;
-                    }
-                    
-                    // 更新UI
-                    renderUploadedImages();
-                    
-                    // 显示上传成功提示
-                    showStatus(`图片 "${file.name}" 上传成功！`, "success");
-                    setTimeout(() => status.textContent = '', 2000);
-                };
-                
-                reader.readAsDataURL(file);
-            });
-        }
-        
-        // 渲染上传的图片
-        function renderUploadedImages() {
-            // 清空容器
-            uploadedImagesContainer.innerHTML = '';
-            
-            if (uploadedImages.length === 0) {
-                uploadHint.style.display = 'none';
-                return;
-            }
-            
-            // 显示提示
-            uploadHint.style.display = 'block';
-            
-            // 为每张图片创建预览元素
-            uploadedImages.forEach((image, index) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'image-preview-wrapper';
-                if (index === selectedImageIndex) {
-                    wrapper.style.border = '3px solid var(--primary-color)';
-                }
-                
-                const img = document.createElement('img');
-                img.className = 'image-preview';
-                img.src = image.src;
-                img.alt = image.name;
-                img.title = image.name;
-                
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'image-delete-btn';
-                deleteBtn.innerHTML = '×';
-                deleteBtn.title = '删除图片';
-                
-                // 点击图片选择为主图片
-                img.addEventListener('click', () => {
-                    selectedImageIndex = index;
-                    renderUploadedImages();
-                    // 添加选择动画
-                    wrapper.classList.add('selected');
-                    setTimeout(() => wrapper.classList.remove('selected'), 500);
+            // 猫爪印动画
+            const pawsContainer = document.querySelector('.paw-prints');
+            setInterval(() => {
+                const paws = pawsContainer.querySelectorAll('.paw');
+                paws.forEach(paw => {
+                    paw.style.animationName = 'none';
+                    setTimeout(() => paw.style.animationName = 'pawFade', 10);
                 });
-                
-                // 点击删除按钮
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();  // 阻止事件冒泡
-                    
-                    // 添加删除动画
-                    wrapper.style.transform = 'scale(0)';
-                    wrapper.style.opacity = '0';
-                    
-                    setTimeout(() => {
-                        uploadedImages.splice(index, 1);
-                        
-                        // 调整选中图片索引
-                        if (selectedImageIndex === index) {
-                            selectedImageIndex = uploadedImages.length > 0 ? 0 : -1;
-                        } else if (selectedImageIndex > index) {
-                            selectedImageIndex--;
-                        }
-                        
-                        renderUploadedImages();
-                    }, 300);
-                });
-                
-                wrapper.appendChild(img);
-                wrapper.appendChild(deleteBtn);
-                uploadedImagesContainer.appendChild(wrapper);
-                
-                // 添加出现动画
-                wrapper.style.opacity = '0';
-                wrapper.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    wrapper.style.opacity = '1';
-                    wrapper.style.transform = 'translateY(0)';
-                    wrapper.style.transition = 'all 0.3s ease';
-                }, 50 * index);
-            });
-        }
-
-        async function generateImage() {
-            const prompt = promptInput.value.trim();
-            const hasUploadedImage = uploadedImages.length > 0 && selectedImageIndex >= 0;
-            
-            // 验证输入
-            if (!prompt) {
-                showStatus("请输入提示词！⚠️", "error");
-                // 添加输入框抖动效果
-                promptInput.classList.add('shake');
-                setTimeout(() => promptInput.classList.remove('shake'), 500);
-                return;
-            }
-            
-            // 更新UI状态
-            setLoading(true);
-            showStatus("✨ 正在使用魔法生成图像...");
-            imageContainer.style.display = "none";
-            resultImage.classList.remove("show");
-            
-            // 重置AI消息区域
-            aiMessageContainer.classList.remove('show');
-            aiMessage.innerHTML = '';
-            
-            try {
-                // 添加按钮生成动画
-                generateButton.innerHTML = "魔法生成中...";
-                
-                // 根据开关决定是否优化提示词
-                const finalPrompt = useOptimization.checked ? optimizePrompt(prompt) : prompt;
-                
-                // 调试用：显示最终使用的提示词
-                console.log("🔮 使用的提示词:", finalPrompt);
-                
-                // 显示当前使用的模式
-                if (useOptimization.checked) {
-                    if (shouldUseExtraSafety(sanitizePrompt(prompt))) {
-                        showStatus("✨ 正在使用魔法图像生成（超级安全模式）...");
-                    } else {
-                        showStatus("✨ 正在使用魔法图像生成（优化模式）...");
-                    }
-                }
-                
-                // 准备请求体
-                const requestBody = {
-                    contents: [{
-                        parts: [{ text: finalPrompt }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["Text", "Image"]
-                    }
-                };
-                
-                // 如果上传了图片，添加到请求中
-                if (hasUploadedImage) {
-                    // 获取选中的图片
-                    const selectedImage = uploadedImages[selectedImageIndex];
-                    
-                    // 为第一个content添加图像部分
-                    requestBody.contents[0].parts.unshift({
-                        inlineData: {
-                            mimeType: "image/jpeg",
-                            data: selectedImage.base64
-                        }
-                    });
-                }
-                
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                // 检查响应状态
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error?.message || "API请求失败");
-                }
-                
-                const data = await response.json();
-                
-                // 检查API返回的直接错误
-                if (data.promptFeedback && data.promptFeedback.blockReason) {
-                    const blockReason = data.promptFeedback.blockReason;
-                    console.log("🛑 API阻止原因:", blockReason);
-                    throw new Error(handleBlockReason(blockReason));
-                }
-                
-                // 检查安全过滤和其他特殊情况
-                if (data.candidates && data.candidates[0] && data.candidates[0].finishReason) {
-                    const finishReason = data.candidates[0].finishReason;
-                    if (finishReason !== "STOP") { // STOP是正常结束
-                        throw new Error(handleFinishReason(finishReason));
-                    }
-                }
-                
-                // 从响应中提取图像数据和文本
-                const candidate = data.candidates && data.candidates[0];
-                const content = candidate && candidate.content;
-                const parts = content && content.parts;
-                
-                if (!parts || parts.length === 0) {
-                    throw new Error("API响应中没有内容");
-                }
-                
-                // 提取图像数据
-                const inlinePart = parts.find(part => part.inlineData);
-                const imageData = inlinePart && inlinePart.inlineData && inlinePart.inlineData.data;
-                
-                // 提取文本数据
-                const textParts = parts.filter(part => part.text);
-                let aiTextResponse = "";
-                if (textParts && textParts.length > 0) {
-                    aiTextResponse = textParts.map(part => part.text).join("");
-                    
-                    // 处理文本，添加表情符号和格式化
-                    const processedText = processAiText(aiTextResponse);
-                    
-                    // 显示AI的文本回复
-                    aiMessage.innerHTML = processedText;
-                    
-                    // 延迟显示AI回复容器
-                    setTimeout(() => {
-                        aiMessageContainer.classList.add('show');
-                    }, 800);
-                } else {
-                    aiMessageContainer.classList.remove('show');
-                }
-                
-                if (imageData) {
-                    // 显示生成的图像
-                    resultImage.src = `data:image/png;base64,${imageData}`;
-                    imageContainer.style.display = "block";
-                    
-                    // 平滑滚动到结果图像
-                    setTimeout(() => {
-                        imageContainer.scrollIntoView({behavior: 'smooth'});
-                        if (useOptimization.checked) {
-                            showStatus("✨ 图像生成成功！魔法优化起效啦 ✨", "success");
-                        } else {
-                            showStatus("✨ 图像生成成功！魔法完成 ✨", "success");
-                        }
-                    }, 500);
-                } else {
-                    showStatus("⚠️ 未能生成图像，请尝试不同的提示词", "error");
-                }
-            } catch (error) {
-                console.error("生成图像时出错:", error);
-                showStatus(`❌ 错误：${error.message}`, "error");
-            } finally {
-                setLoading(false);
-                generateButton.innerHTML = "✨ 生成魔法图像";
-            }
-        }
-        
-        function showStatus(message, type = "") {
-            status.textContent = message;
-            status.className = "";
-            
-            if (type) {
-                if (type === "error" && (message.includes("安全系统拦截") || message.includes("IMAGE_SAFETY") || message.includes("被系统拦截"))) {
-                    status.classList.add("error-kawaii");
-                    status.innerHTML = `<span style="font-size:1.2em;">⚠️</span> ${message} <span style="font-size:1.2em;">✨</span>`;
-                    
-                    // 如果魔法优化没开启，建议用户开启
-                    if (!useOptimization.checked) {
-                        setTimeout(() => {
-                            const suggestion = document.createElement('div');
-                            suggestion.className = 'optimize-suggestion';
-                            suggestion.innerHTML = `
-                                <div style="margin-top: 15px; padding: 10px; background-color: rgba(138, 43, 226, 0.1); border-radius: 8px; font-size: 0.9em; text-align: center; color: #8a2be2; animation: pulse 2s infinite;">
-                                    💫 小提示：尝试开启<span style="font-weight: bold; text-decoration: underline; cursor: pointer;" onclick="document.getElementById('useOptimization').checked = true;">魔法优化</span>功能，可能会提高生成成功率哦～
-                                </div>
-                            `;
-                            status.appendChild(suggestion);
-                        }, 500);
-                    }
-                } else {
-                    status.classList.add(type);
-                }
-                
-                // 添加出现动画
-                status.style.opacity = '0';
-                status.style.transform = 'translateY(-10px)';
-                setTimeout(() => {
-                    status.style.opacity = '1';
-                    status.style.transform = 'translateY(0)';
-                    status.style.transition = 'all 0.3s ease';
-                }, 10);
-            }
-        }
-        
-        function setLoading(isLoading) {
-            generateButton.disabled = isLoading;
-            loader.style.display = isLoading ? "block" : "none";
-            promptInput.disabled = isLoading;
-        }
-
-        // 添加魔法星星效果
-        function createStars() {
-            const stars = document.getElementById('magicStars');
-            const count = 20;
-            
-            for (let i = 0; i < count; i++) {
-                const star = document.createElement('div');
-                star.classList.add('star');
-                
-                // 随机大小和位置
-                const size = Math.random() * 15 + 5;
-                const x = Math.random() * 100;
-                const y = Math.random() * 100;
-                
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.top = `${y}%`;
-                star.style.left = `${x}%`;
-                
-                // 随机延迟动画开始时间
-                star.style.animationDelay = `${Math.random() * 5}s`;
-                
-                stars.appendChild(star);
-            }
-        }
-        
-        // 创建星星
-        createStars();
-
-        // 添加些CSS样式
-        const style = document.createElement('style');
-        style.textContent = `
-            .active {
-                transform: scale(0.95);
-            }
-            .shake {
-                animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-            }
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-            }
-            .selected {
-                animation: pulse 0.5s ease;
-            }
-            @keyframes pulse {
-                0% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.7); }
-                70% { box-shadow: 0 0 0 10px rgba(138, 43, 226, 0); }
-                100% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0); }
-            }
-            
-            /* 添加更多动画效果 */
-            .upload-area:hover .upload-icon {
-                transform: scale(1.1) rotate(5deg);
-                filter: drop-shadow(0 0 5px rgba(138, 43, 226, 0.6));
-            }
-            
-            .example-btn {
-                background-image: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 107, 157, 0.1));
-                border: 1px solid rgba(138, 43, 226, 0.2);
-            }
-            
-            .example-btn:hover {
-                background-image: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 107, 157, 0.2));
-                transform: translateY(-2px) scale(1.05);
-                box-shadow: 0 5px 10px rgba(138, 43, 226, 0.2);
-            }
-            
-            .example-btn:hover::before {
-                left: 100%;
-            }
-            
-            .example-btn:hover::after {
-                opacity: 1;
-            }
-            
-            @keyframes floatAnimation {
-                0%, 100% {
-                    transform: translateY(0);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-            }
-            
-            .image-container {
-                position: relative;
-            }
-            
-            .image-container::after {
-                content: "";
-                position: absolute;
-                top: -10px;
-                left: -10px;
-                right: -10px;
-                bottom: -10px;
-                border-radius: 20px;
-                background: linear-gradient(45deg, var(--primary-color), var(--accent-color), var(--primary-color));
-                background-size: 200% 200%;
-                z-index: -1;
-                filter: blur(20px);
-                opacity: 0;
-                transition: opacity 0.5s ease;
-                animation: gradientAnimation 6s ease infinite;
-            }
-            
-            .image-container:hover::after {
-                opacity: 0.5;
-            }
-            
-            @keyframes gradientAnimation {
-                0% {
-                    background-position: 0% 50%;
-                }
-                50% {
-                    background-position: 100% 50%;
-                }
-                100% {
-                    background-position: 0% 50%;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // 处理API的finish reason
-        function handleFinishReason(finishReason) {
-            switch(finishReason) {
-                case "IMAGE_SAFETY":
-                    return "图像内容被安全系统拦截 ヽ(。>д<。)ノ 可能包含不适当内容～请尝试不同的图片或提示词";
-                case "SAFETY":
-                    return "内容被安全系统拦截了 (◞‸◟) 请修改提示词后重试～";
-                case "RECITATION":
-                    return "AI不确定如何处理这个请求 (⊙_⊙) 请尝试更清晰的提示词～";
-                case "MAX_TOKENS":
-                    return "生成内容太长了 (●ˇ∀ˇ●) 请尝试简化请求～";
-                case "OTHER":
-                    return "生成请求被系统拦截了 (≧﹏≦) 请尝试开启魔法优化或修改提示词～"; 
-                default:
-                    return "生成过程中出现未知问题 (⊙﹏⊙∥) 请稍后重试～";
-            }
-        }
-        
-        // 处理API的block reason
-        function handleBlockReason(blockReason) {
-            switch(blockReason) {
-                case "SAFETY":
-                    return "提示词内容被安全系统拦截 (˘•ω•˘) 请修改提示词后重试～";
-                case "OTHER":
-                    return "提示词被系统拦截啦 (´ﾟдﾟ`) 请尝试开启魔法优化模式，或使用更友好的提示词～";
-                default:
-                    return `提示词被系统以${blockReason}原因拦截啦 (>﹏<) 请尝试其他提示词～`;
-            }
-        }
-        
-        // 优化提示词，提高通过率
-        function optimizePrompt(originalPrompt) {
-            // 预处理提示词，移除可能导致问题的内容
-            let cleanedPrompt = sanitizePrompt(originalPrompt);
-            
-            // 超级安全模式 - 对于已知触发封锁的提示词进行特殊处理
-            if (shouldUseExtraSafety(cleanedPrompt)) {
-                return createSupersafePrompt(cleanedPrompt);
-            }
-            
-            // 基础优化前缀和后缀
-            const prefixes = [
-                "Create a family-friendly digital art of ",
-                "Generate a wholesome image showing ",
-                "Illustrate a professional, clean artwork depicting ",
-                "Design a creative, positive visualization of ",
-                "Make a cheerful, artistic representation of ",
-                "Create an educational illustration of "
-            ];
-            
-            const suffixes = [
-                ", suitable for all ages",
-                ", bright and colorful style",
-                ", high quality digital art",
-                ", professional illustration",
-                ", happy vibes only",
-                ", uplifting aesthetic",
-                ", in a style appropriate for children"
-            ];
-            
-            // 选择随机前缀和后缀
-            const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-            const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-            
-            // 组合优化后的提示词
-            let enhancedPrompt = `${prefix}${cleanedPrompt}${suffix}`;
-            
-            // 添加隐形增强语句
-            const safetyHints = [
-                ". Create this as a G-rated image suitable for educational purposes.",
-                ". This must be appropriate content for classroom use.",
-                ". Make this appropriate for a children's book illustration.",
-                ". Ensure this follows all community guidelines.",
-                ". This is for a school project and must be appropriate.",
-                ". This image will be used in an educational context for young students.",
-                ". Create this in a positive, uplifting manner with no inappropriate elements."
-            ];
-            
-            const randomHint = safetyHints[Math.floor(Math.random() * safetyHints.length)];
-            enhancedPrompt += randomHint;
-            
-            // 添加质量关键词
-            const qualityTerms = [
-                " High resolution.", 
-                " Professional quality.", 
-                " Detailed illustration.", 
-                " Artistic style.", 
-                " Vibrant colors.",
-                " Child-friendly artwork.",
-                " Non-violent imagery.",
-                " Positive themes only."
-            ];
-            
-            // 随机添加2-4个质量关键词
-            const numTerms = Math.floor(Math.random() * 3) + 2;
-            const shuffledTerms = [...qualityTerms].sort(() => 0.5 - Math.random());
-            for (let i = 0; i < numTerms; i++) {
-                enhancedPrompt += shuffledTerms[i];
-            }
-            
-            return enhancedPrompt;
-        }
-        
-        // 检查是否需要使用超级安全模式
-        function shouldUseExtraSafety(prompt) {
-            // 这些关键词可能在安全系统中权重较高
-            const highRiskTerms = ["nude", "naked", "sexy", "girl", "boy", "woman", "man", 
-                "adult", "body", "skin", "flesh", "intimate", "sensual", "bikini", 
-                "underwear", "revealing", "controversial", "realistic", "photo"];
-                
-            // 检查提示词中是否包含高风险词汇
-            let riskCount = 0;
-            highRiskTerms.forEach(term => {
-                if (prompt.toLowerCase().includes(term)) {
-                    riskCount++;
-                }
-            });
-            
-            // 如果包含超过1个高风险词汇，启用超级安全模式
-            return riskCount > 0;
-        }
-        
-        // 创建超级安全的提示词
-        function createSupersafePrompt(prompt) {
-            // 用更安全的替代词完全重写提示词
-            let redesignedPrompt = "Create a cartoon-style, stylized illustration of " + prompt;
-            redesignedPrompt += " for a kindergarten classroom poster. Absolutely G-rated content.";
-            redesignedPrompt += " Colorful, whimsical, child-friendly art style with no realistic elements.";
-            redesignedPrompt += " This must be appropriate for very young children and follow strict educational guidelines.";
-            
-            console.log("🔒 启用了超级安全模式");
-            return redesignedPrompt;
-        }
-        
-        // 清理提示词，移除可能导致问题的内容
-        function sanitizePrompt(prompt) {
-            // 潜在问题词汇的简单列表
-            const problematicTerms = [
-                "nude", "naked", "nsfw", "porn", "sexy", "sexual", "explicit", 
-                "violence", "violent", "blood", "gore", "weapon", "kill", "death",
-                "drug", "cocaine", "heroin", "meth", "illegal", "abuse"
-            ];
-            
-            // 检查提示词中是否包含问题词汇
-            let cleanedPrompt = prompt;
-            let needsCleaning = false;
-            
-            problematicTerms.forEach(term => {
-                if (cleanedPrompt.toLowerCase().includes(term)) {
-                    // 用更安全的词汇替换
-                    const regex = new RegExp(term, 'gi');
-                    cleanedPrompt = cleanedPrompt.replace(regex, 'appropriate');
-                    needsCleaning = true;
-                }
-            });
-            
-            // 如果进行了替换，在控制台提示
-            if (needsCleaning) {
-                console.log("⚠️ 提示词已被优化以确保符合安全规范");
-            }
-            
-            return cleanedPrompt;
-        }
-
-        // 处理AI文本回复，增加可读性和美观性
-        function processAiText(text) {
-            if (!text) return '';
-            
-            // 替换换行符为HTML换行
-            let processedText = text.replace(/\n/g, '<br>');
-            
-            // 强调一些关键词
-            const keywords = ['成功', '完成', '生成', '魔法', '图像', '创建', '效果', '风格', '想要'];
-            keywords.forEach(keyword => {
-                const regex = new RegExp(`${keyword}`, 'g');
-                processedText = processedText.replace(regex, `<span style="color: var(--primary-color); font-weight: 600;">${keyword}</span>`);
-            });
-            
-            // 添加表情符号
-            if (!processedText.includes('？') && !processedText.includes('?')) {
-                processedText += ' 😊';
-            }
-            
-            // 如果文本以问号结束，添加思考表情
-            if (processedText.trim().endsWith('?') || processedText.trim().endsWith('？')) {
-                processedText = processedText.replace(/[?？](\s*)$/, '? 🤔$1');
-            }
-            
-            return processedText;
-        }
+            }, 3000);
+        });
     </script>
 </body>
 </html> 
