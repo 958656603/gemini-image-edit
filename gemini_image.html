@@ -41,6 +41,7 @@
             animation: backgroundShimmer 15s infinite alternate;
             position: relative;
             overflow-x: hidden;
+            overscroll-behavior: none; /* 防止iOS设备上的橡皮筋效果 */
         }
         
         /* 添加可爱的背景元素 */
@@ -364,6 +365,7 @@
             gap: 15px;
             margin: 20px 0;
             justify-content: center;
+            will-change: contents; /* 提示浏览器这个容器内容会变化 */
         }
         
         .image-preview-wrapper {
@@ -374,6 +376,8 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             transition: var(--transition);
+            transform: translateZ(0); /* 触发GPU加速 */
+            will-change: transform, opacity; /* 告知浏览器哪些属性会变化 */
         }
         
         .image-preview-wrapper:hover {
@@ -525,6 +529,8 @@
         .result-container {
             margin-top: 30px;
             display: none;
+            will-change: transform; /* 优化渲染性能 */
+            transform: translateZ(0); /* 触发GPU加速 */
         }
         
         .result-title {
@@ -728,36 +734,43 @@
         if (tooltip) {
             tooltip.addEventListener("mouseenter", function() {
                 const tooltipText = this.querySelector(".tooltip-text");
-                tooltipText.style.visibility = "visible";
-                tooltipText.style.opacity = "1";
+                requestAnimationFrame(() => {
+                    tooltipText.style.visibility = "visible";
+                    tooltipText.style.opacity = "1";
+                });
             });
             
             tooltip.addEventListener("mouseleave", function() {
                 const tooltipText = this.querySelector(".tooltip-text");
-                tooltipText.style.visibility = "hidden";
-                tooltipText.style.opacity = "0";
+                requestAnimationFrame(() => {
+                    tooltipText.style.visibility = "hidden";
+                    tooltipText.style.opacity = "0";
+                });
             });
         }
         
-        // 页面加载完成动画
+        // 页面加载完成动画 - 使用requestAnimationFrame优化
         document.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('.container').style.opacity = '0';
-            setTimeout(() => {
-                document.querySelector('.container').style.opacity = '1';
-                document.querySelector('.container').style.transition = 'opacity 0.8s ease';
-            }, 100);
+            requestAnimationFrame(() => {
+                document.querySelector('.container').style.opacity = '0';
+                requestAnimationFrame(() => {
+                    document.querySelector('.container').style.opacity = '1';
+                    document.querySelector('.container').style.transition = 'opacity 0.8s ease';
+                });
+            });
         });
         
-        // 示例提示按钮事件
-        exampleButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                promptInput.value = button.getAttribute("data-prompt");
-                // 聚焦输入框
-                promptInput.focus();
-                // 添加动画效果
-                button.classList.add('active');
-                setTimeout(() => button.classList.remove('active'), 300);
-            });
+        // 使用事件委托处理示例提示按钮点击
+        document.querySelector('.example-prompts').addEventListener('click', (event) => {
+            const button = event.target.closest('.example-btn');
+            if (!button) return;
+            
+            promptInput.value = button.getAttribute("data-prompt");
+            // 聚焦输入框
+            promptInput.focus();
+            // 添加动画效果
+            button.classList.add('active');
+            setTimeout(() => button.classList.remove('active'), 300);
         });
         
         // 添加回车键触发生成
@@ -844,7 +857,7 @@
             });
         }
         
-        // 渲染上传的图片
+        // 渲染上传的图片 - 性能优化
         function renderUploadedImages() {
             // 清空容器
             uploadedImagesContainer.innerHTML = '';
@@ -856,6 +869,9 @@
             
             // 显示提示
             uploadHint.style.display = 'block';
+            
+            // 使用文档片段减少DOM重绘
+            const fragment = document.createDocumentFragment();
             
             // 为每张图片创建预览元素
             uploadedImages.forEach((image, index) => {
@@ -909,16 +925,28 @@
                 
                 wrapper.appendChild(img);
                 wrapper.appendChild(deleteBtn);
-                uploadedImagesContainer.appendChild(wrapper);
-                
-                // 添加出现动画
-                wrapper.style.opacity = '0';
-                wrapper.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    wrapper.style.opacity = '1';
-                    wrapper.style.transform = 'translateY(0)';
-                    wrapper.style.transition = 'all 0.3s ease';
-                }, 50 * index);
+                fragment.appendChild(wrapper);
+            });
+            
+            // 一次性添加所有元素到DOM
+            uploadedImagesContainer.appendChild(fragment);
+            
+            // 批量应用动画，使用requestAnimationFrame优化
+            requestAnimationFrame(() => {
+                const wrappers = uploadedImagesContainer.querySelectorAll('.image-preview-wrapper');
+                wrappers.forEach((wrapper, index) => {
+                    wrapper.style.opacity = '0';
+                    wrapper.style.transform = 'translateY(20px)';
+                    
+                    requestAnimationFrame(() => {
+                        // 使用延迟来创建序列动画效果，但减少延迟时间
+                        setTimeout(() => {
+                            wrapper.style.opacity = '1';
+                            wrapper.style.transform = 'translateY(0)';
+                            wrapper.style.transition = 'all 0.3s ease';
+                        }, 20 * index); // 减少到20ms的延迟
+                    });
+                });
             });
         }
 
@@ -1462,19 +1490,19 @@
             return cleanedPrompt;
         }
 
-        // 处理AI文本回复，增加可读性和美观性
+        // 处理AI文本回复，增加可读性和美观性 - 优化性能
         function processAiText(text) {
             if (!text) return '';
             
             // 替换换行符为HTML换行
             let processedText = text.replace(/\n/g, '<br>');
             
-            // 强调一些关键词
-            const keywords = ['成功', '完成', '生成', '魔法', '图像', '创建', '效果', '风格', '想要'];
-            keywords.forEach(keyword => {
-                const regex = new RegExp(`${keyword}`, 'g');
-                processedText = processedText.replace(regex, `<span style="color: var(--primary-color); font-weight: 600;">${keyword}</span>`);
-            });
+            // 使用正则表达式一次性替换所有关键词，避免多次循环
+            const keywordsPattern = /(\b(?:成功|完成|生成|魔法|图像|创建|效果|风格|想要)\b)/g;
+            processedText = processedText.replace(
+                keywordsPattern, 
+                '<span style="color: var(--primary-color); font-weight: 600;">$1</span>'
+            );
             
             // 添加表情符号
             if (!processedText.includes('？') && !processedText.includes('?')) {

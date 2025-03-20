@@ -413,6 +413,21 @@
                 </div>
             </a>
             
+            <!-- DeepSeek AI 聊天工具 -->
+            <a href="deepseek_chat.html" class="tool-card">
+                <div class="tool-icon-container">
+                    <div class="tool-icon">🧠</div>
+                </div>
+                <div class="card-content">
+                    <h3>DeepSeek 智能对话</h3>
+                    <p>与先进的 DeepSeek AI 模型畅聊，解答问题、创作内容、激发灵感～</p>
+                    <div class="tool-tags">
+                        <span class="tag">AI对话</span>
+                        <span class="tag">智能助手</span>
+                    </div>
+                </div>
+            </a>
+            
             <!-- 更多工具卡片将在这里添加 -->
             <div class="tool-card" style="opacity: 0.6; cursor: not-allowed;">
                 <div class="tool-icon-container">
@@ -437,22 +452,34 @@
     <script>
         // 添加一些简单的交互效果
         document.addEventListener('DOMContentLoaded', () => {
-            // 页面加载动画
-            document.querySelector('.container').style.opacity = '0';
-            setTimeout(() => {
-                document.querySelector('.container').style.opacity = '1';
-                document.querySelector('.container').style.transition = 'opacity 0.8s ease';
-            }, 100);
-            
-            // 猫爪印动画
-            const pawsContainer = document.querySelector('.paw-prints');
-            setInterval(() => {
-                const paws = pawsContainer.querySelectorAll('.paw');
-                paws.forEach(paw => {
-                    paw.style.animationName = 'none';
-                    setTimeout(() => paw.style.animationName = 'pawFade', 10);
+            // 使用 requestAnimationFrame 优化动画性能
+            requestAnimationFrame(() => {
+                document.querySelector('.container').style.opacity = '0';
+                requestAnimationFrame(() => {
+                    document.querySelector('.container').style.opacity = '1';
+                    document.querySelector('.container').style.transition = 'opacity 0.8s ease';
                 });
-            }, 3000);
+            });
+            
+            // 猫爪印动画 - 优化使用 requestAnimationFrame 和减少DOM操作
+            const pawsContainer = document.querySelector('.paw-prints');
+            const paws = pawsContainer.querySelectorAll('.paw');
+            
+            // 使用 CSS 变量控制动画，减少布局重排
+            let lastPawAnimTime = 0;
+            function animatePaws(timestamp) {
+                if (timestamp - lastPawAnimTime > 3000) {
+                    paws.forEach(paw => {
+                        paw.style.animationName = 'none';
+                        // 强制重绘以确保动画重置
+                        void paw.offsetWidth;
+                        paw.style.animationName = 'pawFade';
+                    });
+                    lastPawAnimTime = timestamp;
+                }
+                requestAnimationFrame(animatePaws);
+            }
+            requestAnimationFrame(animatePaws);
         });
     </script>
 </body>
