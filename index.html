@@ -380,6 +380,125 @@
             0%, 100% { transform: translateY(0) rotate(0); }
             50% { transform: translateY(-5px) rotate(5deg); }
         }
+        
+        /* 喵喵导航模块样式 */
+        .bookmarks-section {
+            margin-bottom: 40px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            border: 2px dashed var(--primary-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bookmarks-section::after {
+            content: "🐾";
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 2.5rem;
+            opacity: 0.1;
+            transform: rotate(15deg);
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-subtitle {
+            font-size: 0.9rem;
+            color: #888;
+            font-weight: normal;
+            margin-left: 10px;
+        }
+        
+        .bookmarks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .bookmark-category {
+            background-color: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(255, 153, 102, 0.1);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.2s ease;
+        }
+        
+        .bookmark-category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 153, 102, 0.2);
+        }
+        
+        .category-title {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .bookmark-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .bookmark-link {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+            border-radius: 30px;
+            transition: all 0.2s ease;
+            gap: 10px;
+        }
+        
+        .bookmark-link:hover {
+            background-color: var(--primary-light);
+            color: #fff;
+            transform: translateX(5px);
+        }
+        
+        .bookmark-icon {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bookmark-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .bookmarks-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 1.4rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .section-subtitle {
+                margin-left: 0;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -394,6 +513,51 @@
                 <div class="paw"></div>
                 <div class="paw"></div>
                 <div class="paw"></div>
+            </div>
+        </div>
+        
+        <!-- 常用导航模块 -->
+        <div class="bookmarks-section">
+            <h2 class="section-title">🔖 喵喵导航 <span class="section-subtitle">我的常用网站收藏</span></h2>
+            
+            <div class="bookmarks-container">
+                <div class="bookmark-category">
+                    <h3 class="category-title">🎨 创作灵感</h3>
+                    <div class="bookmark-links">
+                        <a href="https://twitter.com" target="_blank" class="bookmark-link">
+                            <span class="bookmark-icon">🐦</span>
+                            <span class="bookmark-name">Twitter</span>
+                        </a>
+                        <a href="https://www.pixiv.net" target="_blank" class="bookmark-link">
+                            <span class="bookmark-icon">🖌️</span>
+                            <span class="bookmark-name">Pixiv</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="bookmark-category">
+                    <h3 class="category-title">🤖 AI工具</h3>
+                    <div class="bookmark-links">
+                        <a href="https://platform.deepseek.com" target="_blank" class="bookmark-link">
+                            <span class="bookmark-icon">🧠</span>
+                            <span class="bookmark-name">DeepSeek平台</span>
+                        </a>
+                        <a href="https://aistudio.google.com/prompts/new_chat" target="_blank" class="bookmark-link">
+                            <span class="bookmark-icon">🌈</span>
+                            <span class="bookmark-name">Google AI Studio</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="bookmark-category">
+                    <h3 class="category-title">⚙️ 开发工具</h3>
+                    <div class="bookmark-links">
+                        <a href="https://www.cursor.com/cn/changelog" target="_blank" class="bookmark-link">
+                            <span class="bookmark-icon">📝</span>
+                            <span class="bookmark-name">Cursor更新日志</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         
