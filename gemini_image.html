@@ -621,13 +621,26 @@
         
         /* 错误提示样式 */
         .error-message {
-            background-color: #ffeeee;
-            color: #ff5555;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-left: 4px solid #ff5555;
-            display: none;
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .error-message i {
+            color: #f44336;
+            font-size: 24px;
+        }
+        
+        .error-message p {
+            margin: 0;
+            color: #d32f2f;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -743,14 +756,19 @@
             try {
                 if (window.ApiKeyManager) {
                     API_KEY = await ApiKeyManager.getKey("gemini_api_key");
-                    console.log("已从API密钥管理器获取密钥");
+                    console.log("成功从API密钥管理器获取密钥");
                 } else {
-                    console.log("未能获取API密钥，使用默认密钥");
-                    API_KEY = "AIzaSyDirHd3nwnsiKx7_1eBdm4RUX8T_6TMfz8"; // 默认备用密钥
+                    throw new Error("API密钥管理器不可用");
                 }
             } catch (error) {
-                console.error("API密钥获取错误:", error);
-                API_KEY = "AIzaSyDirHd3nwnsiKx7_1eBdm4RUX8T_6TMfz8"; // 出错时使用默认备用密钥
+                console.error("获取API密钥失败:", error);
+                showError("无法获取API密钥，请联系管理员或在Netlify中设置环境变量 GEMINI_API_KEY");
+                return;
+            }
+
+            if (!API_KEY) {
+                showError("API密钥无效，请联系管理员或在Netlify中设置环境变量 GEMINI_API_KEY");
+                return;
             }
             
             // 其他初始化代码...
@@ -1511,6 +1529,18 @@
             }
             
             return processedText;
+        }
+
+        function showError(message) {
+            messageContainer.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+            
+            messageContainer.style.display = 'block';
+            resultPanel.style.display = 'none';
         }
     </script>
 </body>

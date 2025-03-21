@@ -40,16 +40,24 @@ export default async (request, context) => {
       });
     }
 
-    // 直接硬编码的API密钥，不再通过数据库存储
-    const apiKeys = {
-      'gemini_api_key': 'AIzaSyDirHd3nwnsiKx7_1eBdm4RUX8T_6TMfz8',
-      'deepseek_api_key': 'sk-9f010cf25e1d4c499c71512a7f1047dd',
-      'custom_api_key': 'your-custom-api-key-here'
-    };
+    // 从环境变量获取API密钥
+    // 直接使用 GEMINI_API_KEY 和 DEEPSEEK_API_KEY 环境变量
+    let envKeyName;
+    
+    if (keyName === 'gemini_api_key') {
+      envKeyName = 'GEMINI_API_KEY';
+    } else if (keyName === 'deepseek_api_key') {
+      envKeyName = 'DEEPSEEK_API_KEY';
+    } else {
+      // 其他密钥名称，保持原来的处理方式
+      envKeyName = `API_KEY_${keyName.toUpperCase()}`;
+    }
+    
+    const keyValue = context.env[envKeyName];
 
-    // 检查请求的密钥是否存在
-    if (!apiKeys.hasOwnProperty(keyName)) {
-      return new Response(JSON.stringify({ error: '找不到请求的API密钥' }), {
+    // 检查环境变量中是否存在该密钥
+    if (!keyValue) {
+      return new Response(JSON.stringify({ error: `找不到API密钥: ${keyName}，请检查环境变量 ${envKeyName} 是否已设置` }), {
         status: 404,
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +70,7 @@ export default async (request, context) => {
     return new Response(JSON.stringify({ 
       success: true, 
       keyName: keyName,
-      keyValue: apiKeys[keyName] 
+      keyValue: keyValue 
     }), {
       status: 200,
       headers: {

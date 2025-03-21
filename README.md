@@ -70,25 +70,22 @@ MIT License © 2024
 ### 前置条件
 
 1. 一个[Netlify](https://www.netlify.com/)账户
-2. 一个[Supabase](https://supabase.com/)账户 (用于存储API密钥)
 
-### Supabase设置
+### API密钥设置
 
-1. 在Supabase创建一个新项目
-2. 创建一个名为`api_keys`的新表，包含以下字段:
-   - `id`: UUID, 主键
-   - `key_name`: text, 非空
-   - `key_value`: text, 非空
-   - `updated_at`: timestamp with time zone, 默认: now()
-3. 为`key_name`列添加唯一约束
+在Netlify中设置以下环境变量：
+
+1. `GEMINI_API_KEY`: 你的Google Gemini API密钥
+2. `DEEPSEEK_API_KEY`: 你的DeepSeek API密钥 
+3. 如需添加其他API密钥，请遵循命名规则：`API_KEY_自定义名称`
+
+> 注意：对于gemini_api_key会使用`GEMINI_API_KEY`环境变量，对于deepseek_api_key会使用`DEEPSEEK_API_KEY`环境变量。其他类型的密钥仍使用`API_KEY_大写密钥名`的环境变量。
 
 ### Netlify设置
 
 1. 将代码推送到GitHub仓库
 2. 在Netlify创建一个新站点，从GitHub仓库导入
-3. 在站点设置中添加以下环境变量:
-   - `SUPABASE_URL`: 你的Supabase项目URL
-   - `SUPABASE_SERVICE_KEY`: 你的Supabase服务密钥（从项目设置 > API获取）
+3. 在站点设置中添加API密钥环境变量
 
 ### 部署命令
 
