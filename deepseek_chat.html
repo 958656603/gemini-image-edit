@@ -804,21 +804,39 @@
             // 从后端获取API密钥
             let apiKey = '';
             
-            // 初始化时尝试获取API密钥
-            if (window.ApiKeyManager) {
-                ApiKeyManager.getKey('deepseek_api_key')
-                    .then(key => {
-                        apiKey = key;
-                        console.log('成功从API密钥管理器获取密钥');
-                    })
-                    .catch(error => {
-                        console.error('获取API密钥失败:', error);
-                        addMessage('无法获取API密钥，请联系管理员或在Netlify中设置环境变量 DEEPSEEK_API_KEY', 'bot');
-                    });
-            } else {
-                console.error('API密钥管理器不可用');
-                addMessage('API密钥管理器不可用，请联系管理员', 'bot');
+            // 创建一个async函数来初始化API密钥
+            async function initializeApiKey() {
+                try {
+                    if (window.ApiKeyManager) {
+                        try {
+                            apiKey = await ApiKeyManager.getKey('deepseek_api_key');
+                            console.log('成功从API密钥管理器获取密钥');
+                            return true;
+                        } catch (error) {
+                            console.error('获取API密钥失败:', error);
+                            addMessage('无法获取API密钥，请联系管理员或在Netlify中设置环境变量 DEEPSEEK_API_KEY', 'bot');
+                            return false;
+                        }
+                    } else {
+                        console.error('API密钥管理器不可用');
+                        addMessage('API密钥管理器不可用，请联系管理员', 'bot');
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('初始化API密钥时出错:', error);
+                    addMessage('初始化API密钥时出错，请刷新页面重试', 'bot');
+                    return false;
+                }
             }
+            
+            // 初始化时立即调用
+            initializeApiKey().then(success => {
+                if (success) {
+                    console.log('API密钥初始化成功，可以开始聊天');
+                } else {
+                    console.warn('API密钥初始化失败，聊天功能可能无法正常工作');
+                }
+            });
             
             // 添加消息到聊天界面 - 优化滚动性能
             function addMessage(content, sender) {
@@ -895,9 +913,19 @@
                 // 添加用户消息到聊天
                 addMessage(userMessage, 'user');
                 
-                // 获取API密钥
+                // 确保API密钥已加载
                 if (!apiKey) {
-                    addMessage('请先在设置中输入你的 DeepSeek API Key', 'bot');
+                    // 尝试重新获取API密钥
+                    const keyInitialized = await initializeApiKey();
+                    if (!keyInitialized) {
+                        addMessage('无法获取有效的DeepSeek API密钥，请刷新页面或联系管理员', 'bot');
+                        return;
+                    }
+                }
+                
+                // 再次检查API密钥
+                if (!apiKey) {
+                    addMessage('DeepSeek API密钥无效，请联系管理员设置正确的环境变量', 'bot');
                     return;
                 }
                 
