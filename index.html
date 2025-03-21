@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>橘猫的小玩具</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <!-- 添加API密钥管理器脚本 -->
+    <script src="api-key-manager.js"></script>
     <style>
         :root {
             --primary-color: #FF9966;
@@ -653,6 +655,12 @@
             </div>
         </div>
         
+        <!-- API密钥管理器 -->
+        <div class="bookmarks-section" style="margin-top: 40px;">
+            <h2 class="section-title">🔑 API密钥管理 <span class="section-subtitle">安全存储和加载你的API密钥</span></h2>
+            <div id="api-key-manager"></div>
+        </div>
+        
         <div class="footer">
             <p>🐾 橘猫の魔法工坊 · 2024 🐾</p>
             <p style="font-size: 0.8rem; margin-top: 5px;">猫咪正在努力添加更多有趣的小玩具～</p>
@@ -690,6 +698,18 @@
                 requestAnimationFrame(animatePaws);
             }
             requestAnimationFrame(animatePaws);
+            
+            // 初始化API密钥管理器
+            if (window.ApiKeyManager) {
+                ApiKeyManager.initKeyManagerUI({
+                    containerId: 'api-key-manager',
+                    keyNames: [
+                        'gemini_api_key',
+                        'deepseek_api_key',
+                        'custom_api_key'
+                    ]
+                });
+            }
         });
     </script>
 </body>

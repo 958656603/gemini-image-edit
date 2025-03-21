@@ -1,0 +1,15 @@
+{
+  "name": "gemini-image-edit",
+  "version": "1.0.0",
+  "description": "Gemini Image Edit with Netlify Edge Functions",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "@netlify/edge-functions": "^2.0.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^15.0.0"
+  }
+} 

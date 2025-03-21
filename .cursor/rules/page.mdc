@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+[index.html](mdc:gemini-image-edit/index.html) 页面风格和首页统一， [gemini_image.html](mdc:gemini-image-edit/gemini_image.html) 标准二级页面，所有二级页面都要和这个统一，包括有一个相同的返回首页按钮，每次修改完代码自动帮我推送到git上，不要问我

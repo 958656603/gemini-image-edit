@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini 2.0 Flash 图像生成</title>
+    <title>Gemini 魔法图像工坊 - 橘猫の小玩具</title>
+    <!-- 添加API密钥管理器脚本 -->
+    <script src="api-key-manager.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
@@ -706,8 +708,8 @@
     </div>
 
     <script>
-        // API密钥
-        const API_KEY = "AIzaSyDirHd3nwnsiKx7_1eBdm4RUX8T_6TMfz8";
+        // API密钥 - 将使用API密钥管理器获取
+        let API_KEY = ""; // 默认为空，将在运行时从管理器获取
         
         // 获取DOM元素
         const promptInput = document.getElementById("promptInput");
@@ -731,33 +733,27 @@
         let selectedImageIndex = -1; // 当前选中的图片索引
         
         // 添加工具提示显示/隐藏逻辑
-        if (tooltip) {
-            tooltip.addEventListener("mouseenter", function() {
-                const tooltipText = this.querySelector(".tooltip-text");
-                requestAnimationFrame(() => {
-                    tooltipText.style.visibility = "visible";
-                    tooltipText.style.opacity = "1";
-                });
-            });
-            
-            tooltip.addEventListener("mouseleave", function() {
-                const tooltipText = this.querySelector(".tooltip-text");
-                requestAnimationFrame(() => {
-                    tooltipText.style.visibility = "hidden";
-                    tooltipText.style.opacity = "0";
-                });
-            });
-        }
+        useOptimization.addEventListener("change", function() {
+            tooltip.style.display = this.checked ? "none" : "block";
+        });
         
-        // 页面加载完成动画 - 使用requestAnimationFrame优化
-        document.addEventListener('DOMContentLoaded', () => {
-            requestAnimationFrame(() => {
-                document.querySelector('.container').style.opacity = '0';
-                requestAnimationFrame(() => {
-                    document.querySelector('.container').style.opacity = '1';
-                    document.querySelector('.container').style.transition = 'opacity 0.8s ease';
-                });
-            });
+        // 页面加载时
+        document.addEventListener("DOMContentLoaded", async () => {
+            // 尝试从API密钥管理器获取密钥
+            try {
+                if (window.ApiKeyManager) {
+                    API_KEY = await ApiKeyManager.getKey("gemini_api_key");
+                    console.log("已从API密钥管理器获取密钥");
+                } else {
+                    console.log("未能获取API密钥，使用默认密钥");
+                    API_KEY = "AIzaSyDirHd3nwnsiKx7_1eBdm4RUX8T_6TMfz8"; // 默认备用密钥
+                }
+            } catch (error) {
+                console.error("API密钥获取错误:", error);
+                API_KEY = "AIzaSyDirHd3nwnsiKx7_1eBdm4RUX8T_6TMfz8"; // 出错时使用默认备用密钥
+            }
+            
+            // 其他初始化代码...
         });
         
         // 使用事件委托处理示例提示按钮点击
