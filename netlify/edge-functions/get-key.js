@@ -1,5 +1,4 @@
 // get-key.js - 获取API密钥的Edge函数
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.8'
 
 export default async (request, context) => {
   // 允许GET和OPTIONS请求
@@ -41,34 +40,15 @@ export default async (request, context) => {
       });
     }
 
-    // 使用环境变量初始化Supabase客户端
-    const supabaseUrl = Netlify.env.get('SUPABASE_URL');
-    const supabaseKey = Netlify.env.get('SUPABASE_SERVICE_KEY');
+    // 直接硬编码的API密钥，不再通过数据库存储
+    const apiKeys = {
+      'gemini_api_key': 'AIzaSyDirHd3nwnsiKx7_1eBdm4RUX8T_6TMfz8',
+      'deepseek_api_key': 'sk-9f010cf25e1d4c499c71512a7f1047dd',
+      'custom_api_key': 'your-custom-api-key-here'
+    };
 
-    if (!supabaseUrl || !supabaseKey) {
-      return new Response(JSON.stringify({ error: '服务器配置错误' }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // 从Supabase获取key
-    const { data, error } = await supabase
-      .from('api_keys')
-      .select('key_value')
-      .eq('key_name', keyName)
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    if (!data) {
+    // 检查请求的密钥是否存在
+    if (!apiKeys.hasOwnProperty(keyName)) {
       return new Response(JSON.stringify({ error: '找不到请求的API密钥' }), {
         status: 404,
         headers: {
@@ -82,7 +62,7 @@ export default async (request, context) => {
     return new Response(JSON.stringify({ 
       success: true, 
       keyName: keyName,
-      keyValue: data.key_value 
+      keyValue: apiKeys[keyName] 
     }), {
       status: 200,
       headers: {

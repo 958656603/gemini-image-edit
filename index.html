@@ -698,18 +698,6 @@
                 requestAnimationFrame(animatePaws);
             }
             requestAnimationFrame(animatePaws);
-            
-            // 初始化API密钥管理器
-            if (window.ApiKeyManager) {
-                ApiKeyManager.initKeyManagerUI({
-                    containerId: 'api-key-manager',
-                    keyNames: [
-                        'gemini_api_key',
-                        'deepseek_api_key',
-                        'custom_api_key'
-                    ]
-                });
-            }
         });
     </script>
 </body>

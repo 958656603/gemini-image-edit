@@ -634,11 +634,6 @@
                 <span>⚙️ 设置</span>
             </div>
             <div class="form-group">
-                <label for="api-key">你的 DeepSeek API Key</label>
-                <input type="password" class="form-control" id="api-key" placeholder="在此输入你的 API Key">
-                <div class="api-info">你的 API Key 将只存储在本地浏览器中，不会被发送到其他地方</div>
-            </div>
-            <div class="form-group">
                 <label for="model-select">选择模型</label>
                 <select class="form-control" id="model-select">
                     <option value="deepseek-chat">deepseek-chat</option>
@@ -804,20 +799,25 @@
             const chatForm = document.getElementById('chat-form');
             const chatInput = document.getElementById('chat-input');
             const chatMessages = document.getElementById('chat-messages');
-            const apiKeyInput = document.getElementById('api-key');
             const modelSelect = document.getElementById('model-select');
             
-            // 默认API密钥
-            const defaultApiKey = 'sk-9f010cf25e1d4c499c71512a7f1047dd';
+            // 从后端获取API密钥
+            let apiKey = '';
             
-            // 从本地存储加载API密钥（如果已保存），否则使用默认值
-            const savedApiKey = localStorage.getItem('deepseek_api_key') || defaultApiKey;
-            apiKeyInput.value = savedApiKey;
-            
-            // 保存API密钥到本地存储
-            apiKeyInput.addEventListener('change', () => {
-                localStorage.setItem('deepseek_api_key', apiKeyInput.value);
-            });
+            // 初始化时尝试获取API密钥
+            if (window.ApiKeyManager) {
+                ApiKeyManager.getKey('deepseek_api_key')
+                    .then(key => {
+                        apiKey = key;
+                        console.log('已从API密钥管理器获取密钥');
+                    })
+                    .catch(error => {
+                        console.error('获取API密钥出错:', error);
+                        apiKey = 'sk-9f010cf25e1d4c499c71512a7f1047dd'; // 默认备用密钥
+                    });
+            } else {
+                apiKey = 'sk-9f010cf25e1d4c499c71512a7f1047dd'; // 默认备用密钥
+            }
             
             // 添加消息到聊天界面 - 优化滚动性能
             function addMessage(content, sender) {
@@ -895,7 +895,6 @@
                 addMessage(userMessage, 'user');
                 
                 // 获取API密钥
-                const apiKey = apiKeyInput.value.trim();
                 if (!apiKey) {
                     addMessage('请先在设置中输入你的 DeepSeek API Key', 'bot');
                     return;

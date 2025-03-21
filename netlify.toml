@@ -5,9 +5,5 @@
   framework = "#static"
 
 [[edge_functions]]
-  path = "/api/store-key"
-  function = "store-key"
-
-[[edge_functions]]
   path = "/api/get-key"
   function = "get-key" 
