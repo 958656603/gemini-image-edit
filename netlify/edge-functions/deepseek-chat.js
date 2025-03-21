@@ -58,13 +58,16 @@ export default async (request, context) => {
 
     // 如果是流式请求，直接传递流
     if (isStream) {
+      // 确保我们传递正确的响应头，特别是保持数据是流式的
       return new Response(response.body, {
         status: response.status,
+        statusText: response.statusText,
         headers: {
           'Content-Type': 'text/event-stream',
           'Access-Control-Allow-Origin': '*',
           'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive'
+          'Connection': 'keep-alive',
+          'Transfer-Encoding': 'chunked'
         }
       });
     }

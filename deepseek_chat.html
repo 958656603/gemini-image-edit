@@ -983,30 +983,19 @@
                                 throw new Error(`API请求失败：${response.status} ${response.statusText}`);
                             }
                             
-                            // 确保在这里移除加载指示器
-                            removeTypingIndicator();
+                            // 在这里不立即移除加载指示器，只添加消息容器
                             chatMessages.appendChild(messageDiv);
                             
                             // 处理流式响应
                             const reader = response.body.getReader();
                             const decoder = new TextDecoder();
                             
-                            // 使用防抖函数优化滚动操作
-                            let scrollTimeout;
-                            const debouncedScroll = () => {
-                                if (scrollTimeout) clearTimeout(scrollTimeout);
-                                scrollTimeout = setTimeout(() => {
-                                    requestAnimationFrame(() => {
-                                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                                    });
-                                }, 100);
-                            };
-                            
-                            // 文本缓冲区 - 减少DOM更新频率
+                            // 文本缓冲区
                             let textBuffer = "";
                             let reasoningBuffer = "";
-                            let accumulatedReasoning = "";  // 添加累积思考内容的变量
+                            let accumulatedReasoning = "";
                             let lastUpdateTime = Date.now();
+                            let receivedAnyContent = false; // 新增：标记是否收到过任何内容
                             
                             // 创建固定的div元素
                             const reasoningDiv = document.createElement('div');
@@ -1042,7 +1031,8 @@
                             
                             // 添加一个标志，记录是否收到过思考内容
                             let hasReasoningContent = false;
-                            
+
+                            // 开始处理流式响应
                             return reader.read().then(function processText({ done, value }) {
                                 if (done) {
                                     console.log("流式响应完成，最终思考内容：", accumulatedReasoning);
@@ -1064,6 +1054,9 @@
                                         reasoningDiv.style.display = 'none';
                                     }
                                     
+                                    // 确保在完成时也移除加载指示器（如果还没移除）
+                                    removeTypingIndicator();
+                                    
                                     debouncedScroll();
                                     return;
                                 }
@@ -1081,6 +1074,12 @@
                                             if (json.choices && json.choices[0].delta) {
                                                 const delta = json.choices[0].delta;
                                                 console.log("收到的delta:", delta);
+                                                
+                                                // 一旦收到有效内容，立即移除加载指示器
+                                                if (!receivedAnyContent) {
+                                                    receivedAnyContent = true;
+                                                    removeTypingIndicator();
+                                                }
                                                 
                                                 // 处理思考过程
                                                 if (delta.reasoning_content !== null && delta.reasoning_content !== undefined) {
