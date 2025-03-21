@@ -56,14 +56,14 @@ MIT License © 2024
 
 # 橘猫の魔法工坊
 
-这是一个使用Netlify Edge Functions存储和管理API密钥的静态网站项目。
+这是一个使用Netlify Edge Functions安全代理API调用的静态网站项目。
 
 ## 功能特点
 
-- 静态网页前端，包含多个小工具
-- 使用Netlify Edge Functions作为后端服务
-- 安全存储API密钥到Supabase数据库
-- 通过前端界面轻松管理API密钥
+- 静态网页前端，包含多个AI创意工具
+- 使用Netlify Edge Functions作为安全的后端代理
+- API密钥完全存储在后端，前端无法直接访问
+- 通过环境变量安全管理所有API密钥
 
 ## 部署指南
 
@@ -77,9 +77,9 @@ MIT License © 2024
 
 1. `GEMINI_API_KEY`: 你的Google Gemini API密钥
 2. `DEEPSEEK_API_KEY`: 你的DeepSeek API密钥 
-3. 如需添加其他API密钥，请遵循命名规则：`API_KEY_自定义名称`
+3. 如需添加其他API密钥，请在Netlify环境变量中设置
 
-> 注意：对于gemini_api_key会使用`GEMINI_API_KEY`环境变量，对于deepseek_api_key会使用`DEEPSEEK_API_KEY`环境变量。其他类型的密钥仍使用`API_KEY_大写密钥名`的环境变量。
+> 注意：所有API密钥现在完全存储在Netlify环境变量中，前端不再能够直接访问这些密钥。
 
 ### Netlify设置
 
@@ -102,16 +102,15 @@ git push  # Netlify将自动从GitHub部署
 
 ## 使用说明
 
-1. 打开网站，前往API密钥管理部分
-2. 选择要存储的密钥名称 (如 `gemini_api_key`)
-3. 输入密钥值并点击保存
-4. 使用网站的功能，它们将自动使用存储的密钥
+1. 打开网站，选择你想要使用的工具
+2. 使用功能时，所有API调用都会通过后端安全代理处理
+3. API密钥完全由后端管理，前端代码不会暴露任何敏感信息
 
 ## 技术栈
 
 - 前端: HTML, CSS, JavaScript
 - 后端: Netlify Edge Functions
-- 数据存储: Supabase (PostgreSQL)
+- API集成: Gemini AI、DeepSeek
 
 ## 开发者指南
 
@@ -122,19 +121,23 @@ git push  # Netlify将自动从GitHub部署
 ├── index.html              # 主页
 ├── gemini_image.html       # Gemini图像生成页面
 ├── deepseek_chat.html      # DeepSeek聊天页面
-├── api-key-manager.js      # API密钥管理器脚本
+├── api-key-manager.js      # 已弃用的API密钥管理器（保留兼容性）
 ├── netlify.toml            # Netlify配置文件
 └── netlify/
     └── edge-functions/     # Netlify Edge Functions
-        ├── store-key.js    # 存储密钥函数
-        └── get-key.js      # 获取密钥函数
+        ├── gemini-image.js  # Gemini图像生成代理函数
+        ├── deepseek-chat.js # DeepSeek聊天代理函数
+        └── get-key.js       # 已弃用的获取密钥函数（为兼容性保留）
 ```
 
-### 添加新的API密钥类型
+### 添加新的服务
 
-1. 在`index.html`中的`ApiKeyManager.initKeyManagerUI`函数中的`keyNames`数组添加新的密钥名称
-2. 在需要使用该密钥的页面中使用`ApiKeyManager.getKey("新密钥名")`获取密钥
+要添加新的API服务，请按照以下步骤操作：
 
-### 自定义
+1. 在`netlify/edge-functions/`目录下创建新的代理函数
+2. 在`netlify.toml`中添加新的路由配置
+3. 在前端页面中使用`fetch('/api/你的服务名')`调用后端代理
 
-可以修改`api-key-manager.js`中的样式和交互逻辑，以适应不同的UI需求。 
+### 安全注意事项
+
+所有API密钥现在完全存储在后端，不再暴露给前端。这极大地提高了应用的安全性。任何新功能开发也应该遵循这种模式，避免在前端代码中包含敏感信息。 

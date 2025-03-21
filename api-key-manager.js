@@ -1,29 +1,16 @@
 /**
  * API密钥管理工具
- * 提供获取API密钥的功能，密钥安全地存储在后端
+ * 已弃用：密钥现在安全地存储在后端，并通过后端代理访问
  */
 
 const ApiKeyManager = {
   /**
-   * 获取API密钥
-   * @param {string} keyName - 要获取的密钥名称
-   * @returns {Promise<string>} - 包含密钥值的Promise
+   * 此方法已弃用，API密钥现在由后端安全管理
+   * @deprecated 请直接调用对应的服务端点
    */
   async getKey(keyName) {
-    try {
-      const response = await fetch(`/api/get-key?keyName=${encodeURIComponent(keyName)}`);
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || '获取API密钥失败');
-      }
-      
-      return result.keyValue;
-    } catch (error) {
-      console.error('获取API密钥时出错:', error);
-      throw error;
-    }
+    console.warn('ApiKeyManager.getKey() 已弃用，API密钥现在由后端安全管理');
+    return null;
   }
 };
 
