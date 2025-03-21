@@ -277,6 +277,8 @@
             background: linear-gradient(135deg, #FFF6EE 0%, #FFEBE5 100%);
             position: relative;
             overflow: hidden;
+            background-size: cover;
+            background-position: center;
         }
         
         .tool-icon {
@@ -431,6 +433,25 @@
             box-shadow: 0 3px 10px rgba(255, 153, 102, 0.1);
             border-left: 4px solid var(--primary-color);
             transition: transform 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bookmark-category::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100px;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.08;
+            transition: opacity 0.3s ease;
+        }
+        
+        .bookmark-category:hover::after {
+            opacity: 0.15;
         }
         
         .bookmark-category:hover {
@@ -504,7 +525,9 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="cat-icon">🐱</div>
+            <div class="cat-icon">
+                <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?q=80&w=100&auto=format&fit=crop" alt="橘猫" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+            </div>
             <h1 class="title">橘猫的小玩具</h1>
             <p class="subtitle">一只懒橘猫的神奇工具箱~</p>
             <div class="paw-prints">
@@ -533,6 +556,11 @@
                             <span class="bookmark-name">Pixiv</span>
                         </a>
                     </div>
+                    <style>
+                        .bookmark-category:nth-child(1)::after {
+                            background-image: url('https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=400&auto=format&fit=crop');
+                        }
+                    </style>
                 </div>
                 
                 <div class="bookmark-category">
@@ -547,6 +575,11 @@
                             <span class="bookmark-name">Google AI Studio</span>
                         </a>
                     </div>
+                    <style>
+                        .bookmark-category:nth-child(2)::after {
+                            background-image: url('https://images.unsplash.com/photo-1677442135136-760c813028c0?q=80&w=400&auto=format&fit=crop');
+                        }
+                    </style>
                 </div>
                 
                 <div class="bookmark-category">
@@ -557,6 +590,11 @@
                             <span class="bookmark-name">Cursor更新日志</span>
                         </a>
                     </div>
+                    <style>
+                        .bookmark-category:nth-child(3)::after {
+                            background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=400&auto=format&fit=crop');
+                        }
+                    </style>
                 </div>
             </div>
         </div>
@@ -564,8 +602,8 @@
         <div class="tools-grid">
             <!-- Gemini 图像生成工具 -->
             <a href="gemini_image.html" class="tool-card">
-                <div class="tool-icon-container">
-                    <div class="tool-icon">✨</div>
+                <div class="tool-icon-container" style="background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=600&auto=format&fit=crop');">
+                    <div class="tool-icon" style="color: white; text-shadow: 0 0 10px rgba(0,0,0,0.7);">✨</div>
                 </div>
                 <div class="card-content">
                     <h3>Gemini 魔法图像工坊</h3>
@@ -579,8 +617,8 @@
             
             <!-- DeepSeek AI 聊天工具 -->
             <a href="deepseek_chat.html" class="tool-card">
-                <div class="tool-icon-container">
-                    <div class="tool-icon">🧠</div>
+                <div class="tool-icon-container" style="background-image: url('https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=600&auto=format&fit=crop');">
+                    <div class="tool-icon" style="color: white; text-shadow: 0 0 10px rgba(0,0,0,0.7);">🧠</div>
                 </div>
                 <div class="card-content">
                     <h3>DeepSeek 智能对话</h3>
@@ -594,8 +632,8 @@
             
             <!-- 更多工具卡片将在这里添加 -->
             <div class="tool-card" style="opacity: 0.6; cursor: not-allowed;">
-                <div class="tool-icon-container">
-                    <div class="tool-icon">🔮</div>
+                <div class="tool-icon-container" style="background-image: url('https://images.unsplash.com/photo-1578496479533-7f71df78e3b7?q=80&w=600&auto=format&fit=crop');">
+                    <div class="tool-icon" style="color: white; text-shadow: 0 0 10px rgba(0,0,0,0.7);">🔮</div>
                 </div>
                 <div class="card-content">
                     <h3>敬请期待...</h3>
