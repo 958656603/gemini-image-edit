@@ -53,11 +53,19 @@ export default async (request, context) => {
       envKeyName = `API_KEY_${keyName.toUpperCase()}`;
     }
     
-    const keyValue = context.env[envKeyName];
+    // 使用Netlify.env.get()获取环境变量
+    const keyValue = Netlify.env.get(envKeyName);
 
+    // 添加调试信息(仅在开发环境)
+    console.log(`尝试获取环境变量: ${envKeyName}`);
+    console.log(`获取结果: ${keyValue ? '成功' : '失败'}`);
+    
     // 检查环境变量中是否存在该密钥
     if (!keyValue) {
-      return new Response(JSON.stringify({ error: `找不到API密钥: ${keyName}，请检查环境变量 ${envKeyName} 是否已设置` }), {
+      return new Response(JSON.stringify({ 
+        error: `找不到API密钥: ${keyName}，请检查环境变量 ${envKeyName} 是否已设置`,
+        available_keys: Object.keys(Netlify.env.toObject())
+      }), {
         status: 404,
         headers: {
           'Content-Type': 'application/json',
