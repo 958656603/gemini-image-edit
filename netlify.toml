@@ -14,4 +14,8 @@
 
 [[edge_functions]]
   path = "/api/deepseek-chat"
-  function = "deepseek-chat" 
+  function = "deepseek-chat"
+
+[[edge_functions]]
+  path = "/api/gemini-chat"
+  function = "gemini-chat" 
