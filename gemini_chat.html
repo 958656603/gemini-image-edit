@@ -1204,9 +1204,15 @@
                     const searchResults = data.candidates[0].groundingMetadata?.groundingChunks || [];
                     const webSearchQueries = data.candidates[0].groundingMetadata?.webSearchQueries || [];
                     
-                    // 提取文本并返回搜索结果
+                    // 提取所有文本部分并合并
+                    const allTextParts = data.candidates[0].content.parts
+                        .filter(part => part.text)
+                        .map(part => part.text)
+                        .join('\n');
+                    
+                    // 返回合并后的文本和搜索结果
                     return {
-                        text: data.candidates[0].content.parts[0].text,
+                        text: allTextParts,
                         searchResults: searchResults.length > 0 ? searchResults : null,
                         searchQueries: webSearchQueries.length > 0 ? webSearchQueries : null
                     };
