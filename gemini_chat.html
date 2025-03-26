@@ -283,6 +283,35 @@
             margin-top: 5px;
         }
         
+        .chat-media-container {
+            margin: 10px 0;
+            max-width: 100%;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .chat-media-image {
+            max-width: 100%;
+            max-height: 300px;
+            display: block;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        
+        .chat-media-video {
+            max-width: 100%;
+            max-height: 300px;
+            display: block;
+            border-radius: 10px;
+        }
+        
+        .chat-media-audio {
+            width: 100%;
+            display: block;
+            margin: 10px 0;
+        }
+        
         .input-container {
             position: relative;
             padding: 10px;
@@ -892,24 +921,46 @@
             // 清空输入框
             userInput.value = '';
             
-            // 创建显示给用户的消息文本
+            // 创建显示给用户的消息文本和媒体元素
             let displayMessage = message;
+            let mediaElement = null;
+            let mediaTypeText = '';
             
-            // 如果有媒体文件，添加媒体文件描述
+            // 如果有媒体文件，准备媒体元素
             if (currentMediaFile) {
-                const mediaTypeText = 
+                mediaTypeText = 
                     currentMediaType === 'image' ? '图片' : 
                     currentMediaType === 'video' ? '视频' : '音频';
                 
-                if (displayMessage) {
-                    displayMessage = `[${mediaTypeText}: ${currentMediaFile.name}]\n\n${displayMessage}`;
-                } else {
-                    displayMessage = `[${mediaTypeText}: ${currentMediaFile.name}]`;
+                // 创建适当的媒体元素
+                if (currentMediaType === 'image') {
+                    mediaElement = {
+                        type: 'image',
+                        url: URL.createObjectURL(currentMediaFile),
+                        name: currentMediaFile.name
+                    };
+                } else if (currentMediaType === 'video') {
+                    mediaElement = {
+                        type: 'video',
+                        url: URL.createObjectURL(currentMediaFile),
+                        name: currentMediaFile.name
+                    };
+                } else if (currentMediaType === 'audio') {
+                    mediaElement = {
+                        type: 'audio',
+                        url: URL.createObjectURL(currentMediaFile),
+                        name: currentMediaFile.name
+                    };
+                }
+                
+                // 在文本消息中添加媒体描述（可选）
+                if (!displayMessage) {
+                    displayMessage = '';
                 }
             }
             
             // 添加用户消息到聊天区域
-            addMessageToChat('user', displayMessage);
+            addMessageToChat('user', displayMessage, mediaElement);
             
             // 更新聊天历史 - 只添加文本部分
             chatHistory.push({
@@ -1073,14 +1124,37 @@
         }
         
         // 添加消息到聊天区域
-        function addMessageToChat(sender, message) {
+        function addMessageToChat(sender, message, mediaElement = null) {
             const messageDiv = document.createElement('div');
             messageDiv.className = sender === 'user' ? 'message user-message' : 'message ai-message';
             
-            // 处理链接和格式化文本
-            let formattedMessage = formatMessage(message);
+            // 构建消息内容
+            let messageContent = '';
             
-            messageDiv.innerHTML = formattedMessage;
+            // 如果有媒体元素，首先添加媒体内容
+            if (mediaElement) {
+                if (mediaElement.type === 'image') {
+                    messageContent += `<div class="chat-media-container">
+                        <img src="${mediaElement.url}" class="chat-media-image" alt="${mediaElement.name}" onload="URL.revokeObjectURL('${mediaElement.url}')">
+                    </div>`;
+                } else if (mediaElement.type === 'video') {
+                    messageContent += `<div class="chat-media-container">
+                        <video src="${mediaElement.url}" class="chat-media-video" controls onloadeddata="URL.revokeObjectURL('${mediaElement.url}')"></video>
+                    </div>`;
+                } else if (mediaElement.type === 'audio') {
+                    messageContent += `<div class="chat-media-container">
+                        <audio src="${mediaElement.url}" class="chat-media-audio" controls onloadeddata="URL.revokeObjectURL('${mediaElement.url}')"></audio>
+                    </div>`;
+                }
+            }
+            
+            // 处理链接和格式化文本
+            if (message && message.trim()) {
+                let formattedMessage = formatMessage(message);
+                messageContent += formattedMessage;
+            }
+            
+            messageDiv.innerHTML = messageContent;
             
             // 添加时间戳
             const timeSpan = document.createElement('div');
