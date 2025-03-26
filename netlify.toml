@@ -18,4 +18,8 @@
 
 [[edge_functions]]
   path = "/api/gemini-chat"
-  function = "gemini-chat" 
+  function = "gemini-chat"
+
+[[edge_functions]]
+  path = "/api/upload-media"
+  function = "upload-media" 

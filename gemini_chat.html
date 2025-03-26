@@ -503,6 +503,100 @@
             border-top: 1px dashed rgba(255, 153, 102, 0.3);
         }
         
+        /* 媒体上传样式 */
+        .media-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 10px;
+        }
+        
+        .media-upload-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 153, 102, 0.3);
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .media-upload-btn:hover {
+            background-color: rgba(255, 153, 102, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        #media-preview-container {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 153, 102, 0.3);
+            background-color: white;
+        }
+        
+        .media-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        #remove-media-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #999;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        
+        #remove-media-btn:hover {
+            color: #ff5555;
+        }
+        
+        #media-preview-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-height: 200px;
+            overflow: hidden;
+        }
+        
+        #media-preview-content img {
+            max-height: 180px;
+            max-width: 100%;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        
+        #media-preview-content video {
+            max-height: 180px;
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        
+        #media-preview-content audio {
+            width: 100%;
+        }
+        
+        .media-info {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .media-info-icon {
+            margin-right: 5px;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 20px 15px;
@@ -681,7 +775,21 @@
             </div>
         </div>
         
+        <div id="media-preview-container" style="display: none;">
+            <div class="media-preview-header">
+                <span>已上传媒体文件</span>
+                <button id="remove-media-btn">✕</button>
+            </div>
+            <div id="media-preview-content"></div>
+        </div>
+        
         <div class="input-container">
+            <div class="media-upload-container">
+                <button class="media-upload-btn" id="image-upload-btn" title="上传图片">🖼️</button>
+                <button class="media-upload-btn" id="video-upload-btn" title="上传视频">🎥</button>
+                <button class="media-upload-btn" id="audio-upload-btn" title="上传音频">🎵</button>
+                <input type="file" id="file-upload" accept="image/*,video/*,audio/*" style="display: none;">
+            </div>
             <textarea id="user-input" placeholder="输入你的问题..." rows="1"></textarea>
             <button class="send-button">发送</button>
         </div>
@@ -706,6 +814,20 @@
         const settingsCloseBtn = document.querySelector('.settings-close');
         const settingsOverlay = document.querySelector('.settings-overlay');
         const enableGoogleSearch = document.getElementById('enable-google-search');
+        
+        // 媒体上传相关DOM元素
+        const imageUploadBtn = document.getElementById('image-upload-btn');
+        const videoUploadBtn = document.getElementById('video-upload-btn');
+        const audioUploadBtn = document.getElementById('audio-upload-btn');
+        const fileUploadInput = document.getElementById('file-upload');
+        const mediaPreviewContainer = document.getElementById('media-preview-container');
+        const mediaPreviewContent = document.getElementById('media-preview-content');
+        const removeMediaBtn = document.getElementById('remove-media-btn');
+        
+        // 当前上传的媒体文件
+        let currentMediaFile = null;
+        let currentMediaType = null;
+        let currentMediaUri = null;
         
         // 显示当前值
         const tempValue = document.getElementById('temp-value');
@@ -770,15 +892,31 @@
         // 发送消息
         async function sendMessage() {
             const message = userInput.value.trim();
-            if (!message) return;
+            if (!message && !currentMediaFile) return;
             
             // 清空输入框
             userInput.value = '';
             
-            // 添加用户消息到聊天区域
-            addMessageToChat('user', message);
+            // 创建显示给用户的消息文本
+            let displayMessage = message;
             
-            // 更新聊天历史
+            // 如果有媒体文件，添加媒体文件描述
+            if (currentMediaFile) {
+                const mediaTypeText = 
+                    currentMediaType === 'image' ? '图片' : 
+                    currentMediaType === 'video' ? '视频' : '音频';
+                
+                if (displayMessage) {
+                    displayMessage = `[${mediaTypeText}: ${currentMediaFile.name}]\n\n${displayMessage}`;
+                } else {
+                    displayMessage = `[${mediaTypeText}: ${currentMediaFile.name}]`;
+                }
+            }
+            
+            // 添加用户消息到聊天区域
+            addMessageToChat('user', displayMessage);
+            
+            // 更新聊天历史 - 只添加文本部分
             chatHistory.push({
                 role: "user",
                 parts: [{ text: message }]
@@ -808,6 +946,11 @@
                         role: "model",
                         parts: [{ text: response }]
                     });
+                    
+                    // 清除媒体文件状态
+                    if (currentMediaFile) {
+                        removeMediaBtn.click();
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -833,10 +976,39 @@
                 // 准备请求体
                 const contents = JSON.parse(JSON.stringify(chatHistory));
                 
-                // 添加最后一条用户消息
+                // 最后一条用户消息的parts
+                const messageParts = [];
+                
+                // 添加文本部分（如果有）
+                if (userMessage) {
+                    messageParts.push({ text: userMessage });
+                }
+                
+                // 添加媒体文件部分（如果有）
+                if (currentMediaUri && currentMediaType) {
+                    let mimeType;
+                    if (currentMediaType === 'image') {
+                        mimeType = currentMediaFile.type;
+                    } else if (currentMediaType === 'video') {
+                        mimeType = currentMediaFile.type;
+                    } else if (currentMediaType === 'audio') {
+                        mimeType = currentMediaFile.type;
+                    }
+                    
+                    if (mimeType && currentMediaUri) {
+                        messageParts.push({
+                            file_data: {
+                                mime_type: mimeType,
+                                file_uri: currentMediaUri
+                            }
+                        });
+                    }
+                }
+                
+                // 添加完整的用户消息部分
                 contents.push({
                     role: "user",
-                    parts: [{ text: userMessage }]
+                    parts: messageParts
                 });
                 
                 // 构建API请求数据
@@ -977,6 +1149,133 @@
         document.addEventListener('DOMContentLoaded', () => {
             userInput.focus();
         });
+        
+        // 媒体文件上传处理
+        imageUploadBtn.addEventListener('click', () => {
+            fileUploadInput.accept = 'image/*';
+            fileUploadInput.click();
+        });
+        
+        videoUploadBtn.addEventListener('click', () => {
+            fileUploadInput.accept = 'video/*';
+            fileUploadInput.click();
+        });
+        
+        audioUploadBtn.addEventListener('click', () => {
+            fileUploadInput.accept = 'audio/*';
+            fileUploadInput.click();
+        });
+        
+        fileUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // 保存当前媒体文件
+            currentMediaFile = file;
+            currentMediaType = file.type.split('/')[0]; // image, video, audio
+            
+            // 显示媒体预览
+            displayMediaPreview(file);
+            
+            // 准备上传文件
+            uploadMediaFile(file);
+        });
+        
+        removeMediaBtn.addEventListener('click', () => {
+            // 重置媒体文件状态
+            currentMediaFile = null;
+            currentMediaType = null;
+            currentMediaUri = null;
+            
+            // 隐藏预览
+            mediaPreviewContainer.style.display = 'none';
+            mediaPreviewContent.innerHTML = '';
+        });
+        
+        // 显示媒体预览
+        function displayMediaPreview(file) {
+            mediaPreviewContent.innerHTML = '';
+            
+            const fileType = file.type.split('/')[0];
+            let previewElement;
+            
+            if (fileType === 'image') {
+                previewElement = document.createElement('img');
+                previewElement.src = URL.createObjectURL(file);
+                previewElement.onload = () => URL.revokeObjectURL(previewElement.src);
+            } else if (fileType === 'video') {
+                previewElement = document.createElement('video');
+                previewElement.src = URL.createObjectURL(file);
+                previewElement.controls = true;
+                previewElement.onloadedmetadata = () => URL.revokeObjectURL(previewElement.src);
+            } else if (fileType === 'audio') {
+                previewElement = document.createElement('audio');
+                previewElement.src = URL.createObjectURL(file);
+                previewElement.controls = true;
+                previewElement.onloadedmetadata = () => URL.revokeObjectURL(previewElement.src);
+            }
+            
+            if (previewElement) {
+                mediaPreviewContent.appendChild(previewElement);
+                
+                // 添加文件信息
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'media-info';
+                
+                let iconEmoji;
+                if (fileType === 'image') iconEmoji = '🖼️';
+                else if (fileType === 'video') iconEmoji = '🎥';
+                else if (fileType === 'audio') iconEmoji = '🎵';
+                
+                fileInfo.innerHTML = `
+                    <span class="media-info-icon">${iconEmoji}</span>
+                    <span>${file.name} (${formatFileSize(file.size)})</span>
+                `;
+                mediaPreviewContent.appendChild(fileInfo);
+                
+                // 显示预览容器
+                mediaPreviewContainer.style.display = 'block';
+            }
+        }
+        
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            else return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        
+        // 上传媒体文件到服务器
+        async function uploadMediaFile(file) {
+            try {
+                // 创建 FormData 对象
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // 发送上传请求
+                const response = await fetch('/api/upload-media', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('上传失败');
+                }
+                
+                const data = await response.json();
+                
+                // 保存文件URI，用于发送消息时附加
+                currentMediaUri = data.fileUri;
+                
+                console.log('媒体文件上传成功:', data);
+            } catch (error) {
+                console.error('上传媒体文件出错:', error);
+                alert('上传媒体文件失败: ' + error.message);
+                
+                // 清除当前上传状态
+                removeMediaBtn.click();
+            }
+        }
     </script>
 </body>
 </html>

@@ -8,7 +8,7 @@
 
 ## 🌟 项目简介
 
-橘猫の魔法工坊是一个集成了多种AI创意工具的静态网站项目。目前包含Gemini图像生成与DeepSeek聊天功能，通过Netlify Edge Functions安全代理API调用，确保API密钥完全存储在后端，提高应用安全性。
+橘猫の魔法工坊是一个集成了多种AI创意工具的静态网站项目。目前包含Gemini图像生成、Gemini多模态聊天与DeepSeek聊天功能，通过Netlify Edge Functions安全代理API调用，确保API密钥完全存储在后端，提高应用安全性。
 
 ## ✨ 功能特点
 
@@ -24,6 +24,13 @@
 - 🔄 **多种风格选项**: 支持不同艺术风格和美学效果
 - 💡 **智能提示建议**: AI提供创意建议，助力灵感激发
 - 🌈 **使用最新Gemini 2.0 Flash模型**: 高质量图像生成
+
+### 💬 Gemini 智能聊天
+- 🧠 **Gemini 2.5 Pro模型**: 使用Google最先进的AI模型
+- 📊 **多模态交互**: 支持上传图片、视频和音频进行分析和对话
+- 🎛️ **可调参数**: 温度、Top P、Top K等参数可自定义
+- 🔍 **Google搜索集成**: 可选启用搜索工具获取最新信息
+- 🎨 **美观界面**: 精心设计的聊天界面，支持代码高亮和格式化
 
 ### 💬 DeepSeek 智能对话
 - 🧠 **先进AI模型**: 使用DeepSeek强大的语言模型
@@ -68,6 +75,7 @@ git push  # Netlify将自动从GitHub部署
 
 ## 📝 待开发功能
 
+- [x] Gemini聊天支持多媒体（图片、视频、音频）
 - [ ] 历史记录保存与恢复系统
 - [ ] 图像生成结果分享功能
 - [ ] 用户偏好设置与自定义主题
@@ -81,6 +89,7 @@ git push  # Netlify将自动从GitHub部署
 - **后端**: Netlify Edge Functions
 - **AI 模型**: 
   - Gemini 2.0 Flash (图像生成)
+  - Gemini 2.5 Pro (多模态聊天)
   - DeepSeek (智能对话)
 - **设计理念**: 极简主义、用户友好、视觉美学
 
@@ -90,12 +99,15 @@ git push  # Netlify将自动从GitHub部署
 /
 ├── index.html              # 主页，包含导航和工具卡片
 ├── gemini_image.html       # Gemini图像生成页面
+├── gemini_chat.html        # Gemini多模态聊天页面
 ├── deepseek_chat.html      # DeepSeek聊天页面
 ├── api-key-manager.js      # 已弃用的API密钥管理器（保留兼容性）
 ├── netlify.toml            # Netlify配置文件
 └── netlify/
     └── edge-functions/     # Netlify Edge Functions
         ├── gemini-image.js  # Gemini图像生成代理函数
+        ├── gemini-chat.js   # Gemini聊天代理函数
+        ├── upload-media.js  # 媒体文件上传代理函数
         ├── deepseek-chat.js # DeepSeek聊天代理函数
         └── get-key.js       # 已弃用的获取密钥函数（为兼容性保留）
 ```

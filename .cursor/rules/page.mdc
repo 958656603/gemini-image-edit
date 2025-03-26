@@ -1,6 +1,11 @@
 ---
 description: 
 globs: 
+alwaysApply: false
+---
+---
+description: 
+globs: 
 alwaysApply: true
 ---
 
@@ -9,4 +14,4 @@ alwaysApply: true
 - You can @ files here
 - You can use markdown but dont have to
 
-[index.html](mdc:gemini-image-edit/index.html) 页面风格和首页统一， [gemini_image.html](mdc:gemini-image-edit/gemini_image.html) 标准二级页面，所有二级页面都要和这个统一，包括有一个相同的返回首页按钮，每次修改完代码自动帮我推送到git上，不要问我，并且有任何功能更新一定更新readme文件
+[index.html](mdc:gemini-image-edit/index.html) 页面风格和首页统一，每次修改完代码自动帮我推送到git上，不要问我，并且有任何功能更新一定更新readme文件
