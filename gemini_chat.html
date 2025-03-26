@@ -466,6 +466,62 @@
                 max-width: 90%;
             }
         }
+        
+        /* 开关样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 24px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -524,6 +580,21 @@
                         <option value="65536">65536 (最大)</option>
                     </select>
                 </div>
+
+                <div class="settings-row" style="flex-direction: row; align-items: center;">
+                    <label title="启用Google搜索工具" style="margin-bottom: 0;">
+                        <span>启用Google搜索</span>
+                    </label>
+                    <div style="margin-left: auto;">
+                        <label class="switch">
+                            <input type="checkbox" id="enable-google-search" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                <div style="font-size: 0.75rem; color: #888; margin-top: 5px; margin-bottom: 15px;">
+                    开启后AI可以使用Google搜索获取最新信息
+                </div>
             </div>
             <button class="clear-chat">清空聊天记录</button>
         </div>
@@ -556,6 +627,7 @@
         const clearChatButton = document.querySelector('.clear-chat');
         const settingsToggle = document.querySelector('.settings-toggle');
         const settingsContent = document.querySelector('.settings-content');
+        const enableGoogleSearch = document.getElementById('enable-google-search');
         
         // 显示当前值
         const tempValue = document.getElementById('temp-value');
@@ -673,6 +745,7 @@
                 const topP = parseFloat(topPSlider.value);
                 const topK = parseInt(topKSlider.value);
                 const maxTokens = parseInt(maxTokensSelect.value);
+                const useGoogleSearch = enableGoogleSearch.checked;
                 
                 // 准备请求体
                 const contents = JSON.parse(JSON.stringify(chatHistory));
@@ -694,6 +767,15 @@
                         responseMimeType: "text/plain"
                     }
                 };
+                
+                // 如果启用了Google搜索工具，添加tools配置
+                if (useGoogleSearch) {
+                    requestData.tools = [
+                        {
+                            google_search: {}
+                        }
+                    ];
+                }
                 
                 // 使用服务器端点代理请求
                 const response = await fetch('/api/gemini-chat', {
