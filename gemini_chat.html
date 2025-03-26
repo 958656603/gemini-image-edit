@@ -512,16 +512,15 @@
         }
         
         .media-upload-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 15px;
             border: 1px solid rgba(255, 153, 102, 0.3);
             background-color: white;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
+            font-size: 14px;
             transition: all 0.3s ease;
         }
         
@@ -777,7 +776,7 @@
         
         <div id="media-preview-container" style="display: none;">
             <div class="media-preview-header">
-                <span>已上传媒体文件</span>
+                <span>已上传文件</span>
                 <button id="remove-media-btn">✕</button>
             </div>
             <div id="media-preview-content"></div>
@@ -785,9 +784,7 @@
         
         <div class="input-container">
             <div class="media-upload-container">
-                <button class="media-upload-btn" id="image-upload-btn" title="上传图片">🖼️</button>
-                <button class="media-upload-btn" id="video-upload-btn" title="上传视频">🎥</button>
-                <button class="media-upload-btn" id="audio-upload-btn" title="上传音频">🎵</button>
+                <button class="media-upload-btn" id="file-upload-btn" title="上传文件">📁 上传文件 <span style="font-size: 10px; opacity: 0.7;">(图片/视频/音频)</span></button>
                 <input type="file" id="file-upload" accept="image/*,video/*,audio/*" style="display: none;">
             </div>
             <textarea id="user-input" placeholder="输入你的问题..." rows="1"></textarea>
@@ -816,9 +813,7 @@
         const enableGoogleSearch = document.getElementById('enable-google-search');
         
         // 媒体上传相关DOM元素
-        const imageUploadBtn = document.getElementById('image-upload-btn');
-        const videoUploadBtn = document.getElementById('video-upload-btn');
-        const audioUploadBtn = document.getElementById('audio-upload-btn');
+        const fileUploadBtn = document.getElementById('file-upload-btn');
         const fileUploadInput = document.getElementById('file-upload');
         const mediaPreviewContainer = document.getElementById('media-preview-container');
         const mediaPreviewContent = document.getElementById('media-preview-content');
@@ -929,9 +924,22 @@
             chatContainer.appendChild(loadingIndicator);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             
+            // 获取媒体信息用于API请求
+            const mediaInfo = currentMediaFile ? {
+                file: currentMediaFile,
+                type: currentMediaType,
+                uri: currentMediaUri
+            } : null;
+            
+            // 立即清除媒体预览（无需等待响应）
+            if (currentMediaFile) {
+                mediaPreviewContainer.style.display = 'none';
+                mediaPreviewContent.innerHTML = '';
+            }
+            
             try {
                 // 调用 Gemini API
-                const response = await generateContent(message);
+                const response = await generateContent(message, mediaInfo);
                 
                 // 移除加载指示器
                 chatContainer.removeChild(loadingIndicator);
@@ -947,10 +955,10 @@
                         parts: [{ text: response }]
                     });
                     
-                    // 清除媒体文件状态
-                    if (currentMediaFile) {
-                        removeMediaBtn.click();
-                    }
+                    // 确保清除媒体文件状态
+                    currentMediaFile = null;
+                    currentMediaType = null;
+                    currentMediaUri = null;
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -964,7 +972,7 @@
         }
         
         // 生成内容函数
-        async function generateContent(userMessage) {
+        async function generateContent(userMessage, mediaInfo) {
             try {
                 // 从设置获取参数
                 const temperature = parseFloat(temperatureSlider.value);
@@ -985,21 +993,14 @@
                 }
                 
                 // 添加媒体文件部分（如果有）
-                if (currentMediaUri && currentMediaType) {
-                    let mimeType;
-                    if (currentMediaType === 'image') {
-                        mimeType = currentMediaFile.type;
-                    } else if (currentMediaType === 'video') {
-                        mimeType = currentMediaFile.type;
-                    } else if (currentMediaType === 'audio') {
-                        mimeType = currentMediaFile.type;
-                    }
+                if (mediaInfo && mediaInfo.uri && mediaInfo.type) {
+                    let mimeType = mediaInfo.file.type;
                     
-                    if (mimeType && currentMediaUri) {
+                    if (mimeType && mediaInfo.uri) {
                         messageParts.push({
                             file_data: {
                                 mime_type: mimeType,
-                                file_uri: currentMediaUri
+                                file_uri: mediaInfo.uri
                             }
                         });
                     }
@@ -1151,18 +1152,8 @@
         });
         
         // 媒体文件上传处理
-        imageUploadBtn.addEventListener('click', () => {
-            fileUploadInput.accept = 'image/*';
-            fileUploadInput.click();
-        });
-        
-        videoUploadBtn.addEventListener('click', () => {
-            fileUploadInput.accept = 'video/*';
-            fileUploadInput.click();
-        });
-        
-        audioUploadBtn.addEventListener('click', () => {
-            fileUploadInput.accept = 'audio/*';
+        fileUploadBtn.addEventListener('click', () => {
+            fileUploadInput.accept = 'image/*,video/*,audio/*';
             fileUploadInput.click();
         });
         
@@ -1170,9 +1161,16 @@
             const file = e.target.files[0];
             if (!file) return;
             
+            // 检查文件类型是否为图片、视频或音频
+            const fileType = file.type.split('/')[0];
+            if (fileType !== 'image' && fileType !== 'video' && fileType !== 'audio') {
+                alert('请上传图片、视频或音频文件！');
+                return;
+            }
+            
             // 保存当前媒体文件
             currentMediaFile = file;
-            currentMediaType = file.type.split('/')[0]; // image, video, audio
+            currentMediaType = fileType;
             
             // 显示媒体预览
             displayMediaPreview(file);
@@ -1198,21 +1196,25 @@
             
             const fileType = file.type.split('/')[0];
             let previewElement;
+            let typeLabel = '';
             
             if (fileType === 'image') {
                 previewElement = document.createElement('img');
                 previewElement.src = URL.createObjectURL(file);
                 previewElement.onload = () => URL.revokeObjectURL(previewElement.src);
+                typeLabel = '图片';
             } else if (fileType === 'video') {
                 previewElement = document.createElement('video');
                 previewElement.src = URL.createObjectURL(file);
                 previewElement.controls = true;
                 previewElement.onloadedmetadata = () => URL.revokeObjectURL(previewElement.src);
+                typeLabel = '视频';
             } else if (fileType === 'audio') {
                 previewElement = document.createElement('audio');
                 previewElement.src = URL.createObjectURL(file);
                 previewElement.controls = true;
                 previewElement.onloadedmetadata = () => URL.revokeObjectURL(previewElement.src);
+                typeLabel = '音频';
             }
             
             if (previewElement) {
@@ -1229,7 +1231,7 @@
                 
                 fileInfo.innerHTML = `
                     <span class="media-info-icon">${iconEmoji}</span>
-                    <span>${file.name} (${formatFileSize(file.size)})</span>
+                    <span><strong>${typeLabel}：</strong>${file.name} (${formatFileSize(file.size)})</span>
                 `;
                 mediaPreviewContent.appendChild(fileInfo);
                 
