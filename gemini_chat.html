@@ -476,12 +476,27 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
+            margin-bottom: 20px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
         
         .settings-row {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .settings-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 153, 102, 0.2);
+            grid-column: 1 / span 2;
         }
         
         .settings-row label {
@@ -779,6 +794,23 @@
                     </select>
                 </div>
 
+                <!-- 安全设置选项 -->
+                <div class="settings-section-title">安全设置</div>
+                <div class="settings-row">
+                    <label title="设置内容过滤的严格程度">
+                        <span>内容过滤级别</span>
+                    </label>
+                    <select id="safety-level">
+                        <option value="BLOCK_NONE">无限制 (最低)</option>
+                        <option value="BLOCK_ONLY_HIGH" selected>仅屏蔽高风险</option>
+                        <option value="BLOCK_MEDIUM_AND_ABOVE">屏蔽中高风险</option>
+                        <option value="BLOCK_LOW_AND_ABOVE">严格 (最高)</option>
+                    </select>
+                </div>
+                <div style="font-size: 0.75rem; color: #888; margin-top: 5px; margin-bottom: 15px;">
+                    控制 AI 回复的安全过滤程度，更低的限制可能产生更多创意内容，但也可能包含敏感内容
+                </div>
+
                 <div class="settings-row" style="flex-direction: row; align-items: center;">
                     <label title="启用Google搜索工具" style="margin-bottom: 0;">
                         <span>启用Google搜索</span>
@@ -840,6 +872,7 @@
         const settingsCloseBtn = document.querySelector('.settings-close');
         const settingsOverlay = document.querySelector('.settings-overlay');
         const enableGoogleSearch = document.getElementById('enable-google-search');
+        const safetyLevelSelect = document.getElementById('safety-level');
         
         // 媒体上传相关DOM元素
         const fileUploadBtn = document.getElementById('file-upload-btn');
@@ -1031,6 +1064,7 @@
                 const topK = parseInt(topKSlider.value);
                 const maxTokens = parseInt(maxTokensSelect.value);
                 const useGoogleSearch = enableGoogleSearch.checked;
+                const safetyLevel = safetyLevelSelect.value;
                 
                 // 准备请求体
                 const contents = JSON.parse(JSON.stringify(chatHistory));
@@ -1074,6 +1108,16 @@
                         responseMimeType: "text/plain"
                     }
                 };
+                
+                // 添加安全设置
+                if (safetyLevel !== 'BLOCK_NONE') {
+                    requestData.safetySettings = [
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: safetyLevel },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: safetyLevel },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: safetyLevel },
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: safetyLevel }
+                    ];
+                }
                 
                 // 如果启用了Google搜索工具，添加tools配置
                 if (useGoogleSearch) {
