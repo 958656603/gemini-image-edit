@@ -732,6 +732,48 @@
         .settings-close:hover {
             opacity: 1;
         }
+        
+        /* 搜索结果链接样式 */
+        .search-results-container {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(102, 153, 255, 0.3);
+            font-size: 0.85rem;
+        }
+        
+        .search-results-title {
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+        
+        .search-results-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+        
+        .search-result-link {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: rgba(102, 153, 255, 0.1);
+            border: 1px solid rgba(102, 153, 255, 0.2);
+            border-radius: 12px;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .search-result-link:hover {
+            background-color: rgba(102, 153, 255, 0.2);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -1033,10 +1075,11 @@
                     // 添加 AI 回复到聊天区域
                     addMessageToChat('ai', response);
                     
-                    // 更新聊天历史
+                    // 更新聊天历史 (仅保存文本部分)
+                    const responseText = typeof response === 'object' ? response.text : response;
                     chatHistory.push({
                         role: "model",
-                        parts: [{ text: response }]
+                        parts: [{ text: responseText }]
                     });
                     
                     // 确保清除媒体文件状态
@@ -1157,7 +1200,16 @@
                     data.candidates[0].content.parts && 
                     data.candidates[0].content.parts.length > 0) {
                     
-                    return data.candidates[0].content.parts[0].text;
+                    // 检查是否有搜索结果
+                    const searchResults = data.candidates[0].groundingMetadata?.groundingChunks || [];
+                    const webSearchQueries = data.candidates[0].groundingMetadata?.webSearchQueries || [];
+                    
+                    // 提取文本并返回搜索结果
+                    return {
+                        text: data.candidates[0].content.parts[0].text,
+                        searchResults: searchResults.length > 0 ? searchResults : null,
+                        searchQueries: webSearchQueries.length > 0 ? webSearchQueries : null
+                    };
                 } else {
                     throw new Error('无法获取 AI 回复');
                 }
@@ -1193,7 +1245,17 @@
             }
             
             // 处理链接和格式化文本
-            if (message && message.trim()) {
+            if (message && typeof message === 'object' && message.text) {
+                // 新格式：包含文本和搜索结果
+                let formattedMessage = formatMessage(message.text);
+                messageContent += formattedMessage;
+                
+                // 添加搜索结果链接（如果有）
+                if (message.searchResults && message.searchResults.length > 0) {
+                    messageContent += createSearchResultsHTML(message.searchResults, message.searchQueries);
+                }
+            } else if (message && message.trim()) {
+                // 旧格式：仅文本
                 let formattedMessage = formatMessage(message);
                 messageContent += formattedMessage;
             }
@@ -1395,6 +1457,37 @@
                 // 清除当前上传状态
                 removeMediaBtn.click();
             }
+        }
+        
+        // 创建搜索结果HTML
+        function createSearchResultsHTML(searchResults, searchQueries) {
+            if (!searchResults || searchResults.length === 0) return '';
+            
+            // 最多显示5个结果
+            const limitedResults = searchResults.slice(0, 5);
+            
+            let html = `<div class="search-results-container">
+                <div class="search-results-title">🔍 搜索结果</div>
+                <div class="search-results-links">`;
+            
+            // 添加搜索结果链接
+            limitedResults.forEach(result => {
+                if (result.web && result.web.uri) {
+                    const title = result.web.title || '搜索结果';
+                    html += `<a href="${result.web.uri}" target="_blank" class="search-result-link">${title}</a>`;
+                }
+            });
+            
+            html += `</div>`;
+            
+            // 添加搜索查询词（如果有）
+            if (searchQueries && searchQueries.length > 0) {
+                html += `<div style="margin-top: 5px; font-size: 0.75rem; color: #888;">搜索词: ${searchQueries.join(', ')}</div>`;
+            }
+            
+            html += `</div>`;
+            
+            return html;
         }
     </script>
 </body>
