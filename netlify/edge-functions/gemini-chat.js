@@ -43,6 +43,19 @@ export default async (request, context) => {
       });
     }
 
+    // 准备请求数据，如果没有设置安全设置则添加默认的安全设置
+    const requestPayload = { ...requestData };
+    
+    // 如果没有提供安全设置，则添加默认的安全设置（最低过滤级别 - 只屏蔽高风险内容）
+    if (!requestPayload.safetySettings) {
+      requestPayload.safetySettings = [
+        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }
+      ];
+    }
+
     // 使用 fetch 调用 Gemini 2.5 API
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${apiKey}`, 
@@ -51,7 +64,7 @@ export default async (request, context) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify(requestPayload)
       }
     );
 
