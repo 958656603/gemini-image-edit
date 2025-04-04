@@ -658,6 +658,67 @@
             .message {
                 max-width: 90%;
             }
+            
+            /* 移动设备上优化上传文件按钮 */
+            .media-upload-btn {
+                padding: 6px;
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                justify-content: center;
+            }
+            
+            /* 在移动设备上隐藏文字，只显示图标 */
+            .media-upload-btn span,
+            .upload-text {
+                display: none;
+            }
+            
+            /* 调整输入区域布局 */
+            .input-container {
+                padding: 8px;
+                gap: 8px;
+            }
+            
+            /* 让输入框占据更多空间 */
+            #user-input {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            /* 优化发送按钮 */
+            .send-button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+        
+        /* 更小的屏幕进一步优化 */
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px auto;
+                padding: 15px 10px;
+                border-radius: 15px;
+            }
+            
+            .chat-container {
+                padding: 10px;
+            }
+            
+            .message {
+                padding: 10px 14px;
+                font-size: 0.95rem;
+            }
+            
+            /* 再次调整输入区域 */
+            .input-container {
+                padding: 6px;
+            }
+            
+            .send-button {
+                padding: 8px 12px;
+                min-width: 60px;
+            }
         }
         
         /* 开关样式 */
@@ -777,7 +838,7 @@
     </style>
 </head>
 <body>
-    <a href="index.html" class="home-button">
+    <a class="home-button" href="/">
         <i>🏠</i>
         <span>返回首页</span>
     </a>
@@ -887,7 +948,10 @@
         
         <div class="input-container">
             <div class="media-upload-container">
-                <button class="media-upload-btn" id="file-upload-btn" title="上传文件">📁 上传文件 <span style="font-size: 10px; opacity: 0.7;">(图片/视频/音频)</span></button>
+                <button class="media-upload-btn" id="file-upload-btn" title="上传文件">
+                    📁 
+                    <span class="upload-text">上传文件 <span style="font-size: 10px; opacity: 0.7;">(图片/视频/音频)</span></span>
+                </button>
                 <input type="file" id="file-upload" accept="image/*,video/*,audio/*" style="display: none;">
             </div>
             <textarea id="user-input" placeholder="输入你的问题..." rows="1"></textarea>
