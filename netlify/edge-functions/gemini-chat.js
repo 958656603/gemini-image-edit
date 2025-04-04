@@ -28,19 +28,13 @@ export default async (request, context) => {
     // 获取请求体
     const requestData = await request.json();
     
-    // 获取所有可用的 API 密钥
-    const apiKey1 = Netlify.env.get('GEMINI_API_KEY');
-    const apiKey2 = Netlify.env.get('GEMINI_API_KEY_2');
-    
-    // 创建可用密钥数组
-    const availableKeys = [];
-    if (apiKey1) availableKeys.push(apiKey1);
-    if (apiKey2) availableKeys.push(apiKey2);
+    // 获取 API 密钥
+    const apiKey = Netlify.env.get('GEMINI_API_KEY');
     
     // 检查是否有可用的 API 密钥
-    if (availableKeys.length === 0) {
+    if (!apiKey) {
       return new Response(JSON.stringify({ 
-        error: '找不到 Gemini API 密钥，请检查环境变量 GEMINI_API_KEY 或 GEMINI_API_KEY_2 是否已设置'
+        error: '找不到 Gemini API 密钥，请检查环境变量 GEMINI_API_KEY 是否已设置'
       }), {
         status: 500,
         headers: {
@@ -49,10 +43,6 @@ export default async (request, context) => {
         }
       });
     }
-    
-    // 随机选择一个 API 密钥
-    const randomIndex = Math.floor(Math.random() * availableKeys.length);
-    const selectedApiKey = availableKeys[randomIndex];
 
     // 准备请求数据，如果没有设置安全设置则添加默认的安全设置
     const requestPayload = { ...requestData };
@@ -69,7 +59,7 @@ export default async (request, context) => {
 
     // 使用 fetch 调用 Gemini 2.5 API
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${selectedApiKey}`, 
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${apiKey}`, 
       {
         method: 'POST',
         headers: {
