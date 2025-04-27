@@ -1373,7 +1373,24 @@
                 // 构建最终的 contents 数组：系统指令 + 历史记录 + 当前用户输入
                 const finalContents = [
                     ...systemInstruction,
-                    ...chatHistory,
+                    // 清理历史记录中的搜索结果字段，避免发送到API时出错
+                    ...chatHistory.map(msg => {
+                        // 创建消息的深拷贝
+                        const cleanedMsg = {...msg};
+                        
+                        // 如果有parts，处理每个part，移除额外字段
+                        if (cleanedMsg.parts && cleanedMsg.parts.length > 0) {
+                            cleanedMsg.parts = cleanedMsg.parts.map(part => {
+                                // 如果part是对象且有text，只保留text字段
+                                if (part && typeof part === 'object') {
+                                    return { text: part.text };
+                                }
+                                return part;
+                            });
+                        }
+                        
+                        return cleanedMsg;
+                    }),
                     { role: "user", parts: currentUserParts }
                 ];
                 
