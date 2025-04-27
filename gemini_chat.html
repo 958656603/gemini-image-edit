@@ -1169,9 +1169,36 @@
             chatContainer.innerHTML = ''; // 清空现有内容
             chatHistory.forEach(message => {
                 const sender = message.role === 'user' ? 'user' : 'ai';
-                if (message.parts && message.parts.length > 0 && message.parts[0].text) {
-                    const textContent = message.parts.map(part => part.text || '').join('');
-                    addMessageToChat(sender, textContent, null, true);
+                if (message.parts && message.parts.length > 0) {
+                    const messagePart = message.parts[0];
+                    
+                    // 检查消息部分是否为对象且不为null
+                    if (messagePart && typeof messagePart === 'object') {
+                        if (messagePart.text) {
+                            // 检查是否有搜索结果属性
+                            if (messagePart.searchResults || messagePart.searchQueries) {
+                                // 新格式：带搜索结果的消息
+                                addMessageToChat(sender, {
+                                    text: messagePart.text,
+                                    searchResults: messagePart.searchResults || [],
+                                    searchQueries: messagePart.searchQueries || []
+                                }, null, true);
+                            } else {
+                                // 旧格式：只有文本的消息
+                                addMessageToChat(sender, messagePart.text, null, true);
+                            }
+                        }
+                    } else {
+                        // 处理旧的格式：直接获取所有parts的text
+                        const textContent = message.parts
+                            .filter(part => part && part.text) // 确保part存在且有text属性
+                            .map(part => part.text || '')
+                            .join('\n');
+                            
+                        if (textContent) {
+                            addMessageToChat(sender, textContent, null, true);
+                        }
+                    }
                 }
             });
             chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -1416,13 +1443,21 @@
                     // 返回合并后的文本和搜索结果
                     const responseText = typeof data.candidates[0].content === 'object' ? data.candidates[0].content.parts.map(part => part.text || '').join('\n') : data.candidates[0].content;
                     
-                    // 添加 AI 回复到聊天区域
-                    addMessageToChat('ai', responseText, null, false);
+                    // 添加 AI 回复到聊天区域 - 修改这里，传递搜索结果
+                    addMessageToChat('ai', {
+                        text: responseText,
+                        searchResults: searchResults,
+                        searchQueries: webSearchQueries
+                    }, null, false);
                     
-                    // 更新聊天历史 (仅保存文本部分和搜索结果)
+                    // 更新聊天历史 (保存文本部分和搜索结果)
                     chatHistory.push({
                         role: "model",
-                        parts: [{ text: responseText }]
+                        parts: [{ 
+                            text: responseText,
+                            searchResults: searchResults,
+                            searchQueries: webSearchQueries
+                        }]
                     });
                     
                     // 保存更新后的聊天记录
