@@ -998,16 +998,77 @@
         const topKValue = document.getElementById('topk-value');
         const tokensValue = document.getElementById('tokens-value');
         
-        // 聊天历史
-        let chatHistory = [
-            {
-                role: "model",
-                parts: [{ text: "Hi，我是 Gemini 2.5 Pro，一个由 Google 训练的强大 AI。有什么我能帮你的吗？😊" }]
-            }
-        ];
+        // 聊天历史 - 初始化时尝试从 localStorage 加载
+        let chatHistory = [];
         
-        // 初始化设置值显示
-        updateSettingsDisplay();
+        // 本地存储的 Key
+        const CHAT_HISTORY_KEY = 'geminiChatHistory';
+        
+        // 初始化函数
+        function initializeChat() {
+            // 尝试从 localStorage 加载聊天记录
+            const savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+            if (savedHistory) {
+                try {
+                    chatHistory = JSON.parse(savedHistory);
+                    // 如果加载成功，渲染聊天记录
+                    renderChatHistory();
+                    console.log("聊天记录已从 localStorage 加载 📜");
+                } catch (e) {
+                    console.error("解析聊天记录失败:", e);
+                    // 解析失败，使用默认欢迎语
+                    setDefaultWelcomeMessage();
+                    localStorage.removeItem(CHAT_HISTORY_KEY); // 清除损坏的记录
+                }
+            } else {
+                // 没有记录，使用默认欢迎语
+                setDefaultWelcomeMessage();
+            }
+            
+            // 初始化设置值显示
+            updateSettingsDisplay();
+            userInput.focus();
+        }
+        
+        // 设置默认欢迎消息并初始化历史记录
+        function setDefaultWelcomeMessage() {
+            const welcomeText = "Hi，我是 Gemini 2.5 Pro，一个由 Google 训练的强大 AI。有什么我能帮你的吗？😊";
+            chatHistory = [
+                {
+                    role: "model",
+                    parts: [{ text: welcomeText }]
+                }
+            ];
+            chatContainer.innerHTML = `<div class="ai-message">${formatMessage(welcomeText)}<div class="message-time">${new Date().toLocaleTimeString()}</div></div>`;
+        }
+        
+        // 根据 chatHistory 数组渲染聊天界面
+        function renderChatHistory() {
+            chatContainer.innerHTML = ''; // 清空现有内容
+            chatHistory.forEach(message => {
+                const sender = message.role === 'user' ? 'user' : 'ai';
+                // 注意：localStorage 只保存了 text part，媒体信息不会恢复显示
+                if (message.parts && message.parts.length > 0 && message.parts[0].text) {
+                     // 这里简化处理，只显示文本部分，不处理多部分或非文本部分
+                     // 如果需要支持多模态历史记录恢复，需要更复杂的逻辑
+                    const textContent = message.parts.map(part => part.text || '').join(''); // 合并所有文本部分
+                    addMessageToChat(sender, textContent, null, true); // 传递 isHistory = true 避免重复保存
+                }
+            });
+             // 滚动到底部
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // 保存聊天记录到 localStorage
+        function saveChatHistory() {
+            try {
+                localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(chatHistory));
+                console.log("聊天记录已保存到 localStorage 💾");
+            } catch (e) {
+                console.error("保存聊天记录失败:", e);
+                // 可以在这里添加一些用户提示，比如存储空间已满
+            }
+        }
         
         // 更新滑块值显示
         function updateSettingsDisplay() {
@@ -1041,14 +1102,14 @@
         
         // 清空聊天记录
         clearChatButton.addEventListener('click', () => {
-            if (confirm('确定要清空聊天记录吗？')) {
-                chatHistory = [
-                    {
-                        role: "model",
-                        parts: [{ text: "Hi，我是 Gemini 2.5 Pro，一个由 Google 训练的强大 AI。有什么我能帮你的吗？😊" }]
-                    }
-                ];
-                chatContainer.innerHTML = '<div class="ai-message">Hi，我是 Gemini 2.5 Pro，一个由 Google 训练的强大 AI。有什么我能帮你的吗？😊</div>';
+            if (confirm('确定要清空聊天记录吗？这将无法恢复！')) {
+                // 清空内存中的历史记录并设置默认欢迎消息
+                setDefaultWelcomeMessage();
+                // 从 localStorage 中移除记录
+                localStorage.removeItem(CHAT_HISTORY_KEY);
+                console.log("聊天记录已清空 🗑️");
+                // 清空媒体预览（如果存在）
+                removeMediaBtn.click();
             }
         });
         
@@ -1101,11 +1162,13 @@
             // 添加用户消息到聊天区域
             addMessageToChat('user', displayMessage, mediaElement);
             
-            // 更新聊天历史 - 只添加文本部分
-            chatHistory.push({
-                role: "user",
-                parts: [{ text: message }]
-            });
+            // 更新聊天历史 - 构造包含多种 part 的结构
+            const userMessageParts = [];
+            if (displayMessage) {
+                userMessageParts.push({ text: displayMessage });
+            }
+            // 注意：本地存储目前不保存媒体信息，这部分仅用于API请求
+            // 如果需要保存媒体信息，需要修改 saveChatHistory 和 loadChatHistory 逻辑
             
             // 显示加载指示器
             const loadingIndicator = document.createElement('div');
@@ -1136,15 +1199,32 @@
                 
                 // 处理响应
                 if (response) {
+                    // 添加用户消息到历史记录 (在收到回复前添加，确保顺序正确)
+                    // 检查上一条是否已经是用户的消息，避免重复添加（虽然理论上不会）
+                     if (chatHistory.length === 0 || chatHistory[chatHistory.length - 1].role !== 'user') {
+                         chatHistory.push({
+                             role: "user",
+                             parts: userMessageParts // 使用上面构建的 parts
+                         });
+                     } else {
+                         // 如果上一条已经是 user 消息，可以合并 parts 或替换，这里简单替换
+                         chatHistory[chatHistory.length - 1].parts = userMessageParts;
+                     }
+
                     // 添加 AI 回复到聊天区域
-                    addMessageToChat('ai', response);
+                    addMessageToChat('ai', response); // isHistory 默认为 false，会触发保存
                     
-                    // 更新聊天历史 (仅保存文本部分)
+                    // 更新聊天历史 (仅保存文本部分和搜索结果)
                     const responseText = typeof response === 'object' ? response.text : response;
+                     // Google搜索结果暂时不保存到历史记录，以简化存储
                     chatHistory.push({
                         role: "model",
-                        parts: [{ text: responseText }]
+                         // 暂时只保存text部分到历史记录
+                        parts: [{ text: responseText }] 
                     });
+                    
+                    // 保存更新后的聊天记录
+                    saveChatHistory(); // 在AI回复添加并更新历史后保存
                     
                     // 确保清除媒体文件状态
                     currentMediaFile = null;
@@ -1152,13 +1232,14 @@
                     currentMediaUri = null;
                 }
             } catch (error) {
-                console.error('Error:', error);
+                 console.error('Error:', error);
                 
                 // 移除加载指示器
-                chatContainer.removeChild(loadingIndicator);
+                 chatContainer.removeChild(loadingIndicator);
                 
-                // 显示错误消息
+                 // 显示错误消息
                 addMessageToChat('ai', `抱歉，处理请求时出错：${error.message || '未知错误'}`);
+                // 出错时不保存历史记录
             }
         }
         
@@ -1173,40 +1254,48 @@
                 const useGoogleSearch = enableGoogleSearch.checked;
                 const safetyLevel = safetyLevelSelect.value;
                 
-                // 准备请求体
-                const contents = JSON.parse(JSON.stringify(chatHistory));
+                // 准备请求体 - 直接使用内存中的 chatHistory 克隆
+                // **重要**: 过滤掉可能不适合发送给API的历史记录结构（如果本地存储了额外信息）
+                // 当前实现中，chatHistory 只包含 {role: 'user'/'model', parts: [{text: ...}]} 结构，可以直接使用
+                const apiHistory = JSON.parse(JSON.stringify(chatHistory)); 
                 
-                // 最后一条用户消息的parts
-                const messageParts = [];
-                
+                // **重要**: 移除最后一条AI消息，因为API调用时 history 只应包含到上一轮为止的内容
+                if (apiHistory.length > 0 && apiHistory[apiHistory.length - 1].role === 'model') {
+                    // 如果是从空记录开始的第一条用户消息，则历史为空
+                    // if (apiHistory.length > 1) { // 保留第一条欢迎消息
+                    //      apiHistory.pop(); // 移除最后一条 model 消息
+                    // } 
+                    // 修正：不应该移除欢迎消息，而是移除上一轮的model回复
+                    // 如果历史记录最后一条是 model，就移除它
+                    // （这个逻辑可能需要根据API的具体要求调整，Gemini API需要完整的对话历史）
+                    // 保持原样，Gemini API 通常需要完整的上下文
+                }
+
+                // 构造当前用户输入的部分
+                const currentUserParts = [];
+                // 添加媒体文件部分（必须在文本之前！）
+                 if (mediaInfo && mediaInfo.uri && mediaInfo.type) {
+                     let mimeType = mediaInfo.file.type;
+                    
+                     if (mimeType && mediaInfo.uri) {
+                         currentUserParts.push({
+                             file_data: {
+                                 mime_type: mimeType,
+                                 file_uri: mediaInfo.uri
+                             }
+                         });
+                     }
+                 }
                 // 添加文本部分（如果有）
                 if (userMessage) {
-                    messageParts.push({ text: userMessage });
+                    currentUserParts.push({ text: userMessage });
                 }
-                
-                // 添加媒体文件部分（如果有）
-                if (mediaInfo && mediaInfo.uri && mediaInfo.type) {
-                    let mimeType = mediaInfo.file.type;
-                    
-                    if (mimeType && mediaInfo.uri) {
-                        messageParts.push({
-                            file_data: {
-                                mime_type: mimeType,
-                                file_uri: mediaInfo.uri
-                            }
-                        });
-                    }
-                }
-                
-                // 添加完整的用户消息部分
-                contents.push({
-                    role: "user",
-                    parts: messageParts
-                });
                 
                 // 构建API请求数据
                 const requestData = {
-                    contents: contents,
+                    // contents 应该包含历史记录 + 当前用户输入
+                    // contents: apiHistory.concat([{ role: "user", parts: currentUserParts }]), // 将当前输入追加到历史后
+                    contents: [...apiHistory, { role: "user", parts: currentUserParts }], // 使用扩展运算符更清晰
                     generationConfig: {
                         temperature: temperature,
                         topK: topK,
@@ -1289,8 +1378,8 @@
             }
         }
         
-        // 添加消息到聊天区域
-        function addMessageToChat(sender, message, mediaElement = null) {
+        // 添加消息到聊天区域 - 增加 isHistory 参数
+        function addMessageToChat(sender, message, mediaElement = null, isHistory = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = sender === 'user' ? 'message user-message' : 'message ai-message';
             
@@ -1343,6 +1432,12 @@
             
             // 滚动到底部
             chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // 如果不是从历史记录加载，并且是 AI 消息，则保存历史记录
+            // 修正：保存操作统一移到 sendMessage 成功回调中
+            // if (!isHistory && sender === 'ai') {
+            //     saveChatHistory(); 
+            // }
         }
         
         // 格式化消息，处理链接和代码等
@@ -1396,10 +1491,8 @@
         
         sendButton.addEventListener('click', sendMessage);
         
-        // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            userInput.focus();
-        });
+        // 初始化 - 改为调用新的初始化函数
+        document.addEventListener('DOMContentLoaded', initializeChat);
         
         // 媒体文件上传处理
         fileUploadBtn.addEventListener('click', () => {
