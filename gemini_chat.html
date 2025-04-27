@@ -1314,12 +1314,16 @@
                     activePersonaPrompt = presetPersonas[selectedPersonaPreset];
                 }
                 
-                // 构造系统指令（如果设置了角色）
+                // 构造系统指令（*仅当*设置了非默认角色时）
                 const systemInstruction = activePersonaPrompt
                     ? [
-                        { role: "user", parts: [{ text: `(System Command: Please adopt the following persona for our entire conversation: ${activePersonaPrompt})` }] },
-                    ]
-                    : [];
+                        {
+                            role: "user",
+                            parts: [{ text: `(System Command: Please adopt the following persona for our entire conversation: ${activePersonaPrompt})` }]
+                        },
+                        // Optional: Add a model confirmation turn here if needed, but usually not necessary
+                       ]
+                    : []; // If default persona, empty array (no system instruction)
                 
                 // 构造当前用户输入的部分
                 const currentUserParts = [];
