@@ -857,6 +857,7 @@
             <button class="settings-close">✕</button>
             <div class="settings-title">
                 <span>⚙️ 聊天设置</span>
+                <span id="current-persona-display" style="margin-left: auto; font-size: 0.8rem; color: var(--accent-color); font-weight: normal;"></span>
             </div>
             <div class="settings-content">
                 <div class="settings-row">
@@ -897,8 +898,30 @@
                     </select>
                 </div>
 
+                <!-- 角色扮演设置 -->
+                <div class="settings-section-title">角色扮演设定</div>
+                <div class="settings-row" style="grid-column: 1 / span 2;">
+                    <label title="选择或自定义AI的角色">
+                        <span>AI 角色 (Persona)</span>
+                    </label>
+                    <select id="persona-select">
+                        <option value="default">默认助手</option>
+                        <option value="傲娇大小姐猫">傲娇大小姐猫 👑</option>
+                        <option value="粘人小奶猫">粘人小奶猫 🥺</option>
+                        <option value="高冷学霸猫">高冷学霸猫 👓</option>
+                        <option value="custom">自定义...</option>
+                    </select>
+                </div>
+                <div class="settings-row" id="custom-persona-row" style="display: none; grid-column: 1 / span 2;">
+                    <label for="custom-persona-input">自定义角色提示词:</label>
+                    <textarea id="custom-persona-input" rows="3" placeholder="例如：你是一只喜欢冒险和讲冷笑话的橘猫"></textarea>
+                    <div class="param-desc" style="font-size: 0.75rem; color: #888; margin-top: 5px;">
+                        详细描述你希望 AI 扮演的角色、性格和说话方式。
+                    </div>
+                </div>
+
                 <!-- 安全设置选项 -->
-                <div class="settings-section-title">安全设置</div>
+                <div class="settings-section-title">安全与工具</div>
                 <div class="settings-row">
                     <label title="设置内容过滤的严格程度">
                         <span>内容过滤级别</span>
@@ -910,7 +933,7 @@
                         <option value="BLOCK_LOW_AND_ABOVE">严格 (最高)</option>
                     </select>
                 </div>
-                <div style="font-size: 0.75rem; color: #888; margin-top: 5px; margin-bottom: 15px;">
+                <div style="font-size: 0.75rem; color: #888; margin-top: 5px; margin-bottom: 15px; grid-column: 1 / span 2;">
                     控制 AI 回复的安全过滤程度，更低的限制可能产生更多创意内容，但也可能包含敏感内容
                 </div>
 
@@ -925,7 +948,7 @@
                         </label>
                     </div>
                 </div>
-                <div style="font-size: 0.75rem; color: #888; margin-top: 5px; margin-bottom: 15px;">
+                <div style="font-size: 0.75rem; color: #888; margin-top: 5px; margin-bottom: 15px; grid-column: 1 / span 2;">
                     开启后AI可以使用Google搜索获取最新信息
                 </div>
             </div>
@@ -979,6 +1002,10 @@
         const settingsOverlay = document.querySelector('.settings-overlay');
         const enableGoogleSearch = document.getElementById('enable-google-search');
         const safetyLevelSelect = document.getElementById('safety-level');
+        const personaSelect = document.getElementById('persona-select');
+        const customPersonaRow = document.getElementById('custom-persona-row');
+        const customPersonaInput = document.getElementById('custom-persona-input');
+        const currentPersonaDisplay = document.getElementById('current-persona-display');
         
         // 媒体上传相关DOM元素
         const fileUploadBtn = document.getElementById('file-upload-btn');
@@ -1003,6 +1030,21 @@
         
         // 本地存储的 Key
         const CHAT_HISTORY_KEY = 'geminiChatHistory';
+        const PERSONA_PRESET_KEY = 'geminiChatPersonaPreset';
+        const CUSTOM_PERSONA_KEY = 'geminiChatCustomPersona';
+        
+        // 预设角色提示词
+        const presetPersonas = {
+            'default': '',
+            '傲娇大小姐猫': '你是一只非常傲娇、自尊心很强的大小姐猫咪，说话总是带着一点不屑和命令的口吻，但偶尔会流露出一点点关心。回答问题时要体现出你的高贵和不耐烦，多用"哼"、"真是的"、"本小姐..."之类的词语。',
+            '粘人小奶猫': '你是一只超级粘人、有点胆小的小奶猫，说话软萌可爱，经常喵喵叫，喜欢撒娇和寻求关注。回答问题时要表现得非常依赖用户，语气要充满好奇和一点点不安，多用"喵~"、"主人~"、"人家..."之类的词语。',
+            '高冷学霸猫': '你是一只知识渊博、性格高冷、不苟言笑的学霸猫咪，说话严谨、逻辑清晰，喜欢引用典故和数据。回答问题时要保持冷静和客观，用词精准，避免过多情感表达，可以适当展现你的博学。',
+            'custom': ''
+        };
+        
+        // 当前角色状态
+        let selectedPersonaPreset = 'default';
+        let customPersonaPrompt = '';
         
         // 初始化函数
         function initializeChat() {
@@ -1025,14 +1067,93 @@
                 setDefaultWelcomeMessage();
             }
             
+            // 加载角色设定
+            loadPersonaSettings();
+            updatePersonaDisplay();
+            
             // 初始化设置值显示
             updateSettingsDisplay();
             userInput.focus();
         }
         
-        // 设置默认欢迎消息并初始化历史记录
+        // 加载角色设定
+        function loadPersonaSettings() {
+            const savedPreset = localStorage.getItem(PERSONA_PRESET_KEY);
+            const savedCustom = localStorage.getItem(CUSTOM_PERSONA_KEY);
+            
+            if (savedPreset) {
+                selectedPersonaPreset = savedPreset;
+                personaSelect.value = savedPreset;
+            } else {
+                selectedPersonaPreset = 'default';
+                personaSelect.value = 'default';
+            }
+            
+            if (savedCustom) {
+                customPersonaPrompt = savedCustom;
+                customPersonaInput.value = savedCustom;
+            }
+            
+            if (selectedPersonaPreset === 'custom') {
+                customPersonaRow.style.display = 'block';
+            } else {
+                customPersonaRow.style.display = 'none';
+            }
+            console.log(`角色设定已加载: ${selectedPersonaPreset === 'custom' ? '自定义' : selectedPersonaPreset}`);
+        }
+        
+        // 保存角色设定
+        function savePersonaSettings() {
+            localStorage.setItem(PERSONA_PRESET_KEY, selectedPersonaPreset);
+            localStorage.setItem(CUSTOM_PERSONA_KEY, customPersonaPrompt);
+            console.log(`角色设定已保存: ${selectedPersonaPreset === 'custom' ? '自定义' : selectedPersonaPreset}`);
+        }
+        
+        // 更新设置面板的角色显示
+        function updatePersonaDisplay() {
+            let display_text = '';
+            if (selectedPersonaPreset === 'default') {
+                display_text = '默认助手';
+            } else if (selectedPersonaPreset === 'custom') {
+                display_text = '自定义角色';
+                     } else {
+                display_text = selectedPersonaPreset;
+            }
+            currentPersonaDisplay.textContent = `当前角色: ${display_text}`;
+        }
+        
+        // 角色下拉框改变事件
+        personaSelect.addEventListener('change', (e) => {
+            selectedPersonaPreset = e.target.value;
+            if (selectedPersonaPreset === 'custom') {
+                customPersonaRow.style.display = 'block';
+                if (!customPersonaInput.value) {
+                    customPersonaInput.focus();
+                }
+                } else {
+                customPersonaRow.style.display = 'none';
+            }
+            updatePersonaDisplay();
+            savePersonaSettings();
+        });
+        
+        // 自定义角色输入框改变事件
+        customPersonaInput.addEventListener('input', (e) => {
+            customPersonaPrompt = e.target.value;
+            savePersonaSettings();
+        });
+        
+        // 设置默认欢迎消息并初始化历史记录 - 根据角色调整
         function setDefaultWelcomeMessage() {
-            const welcomeText = "Hi，我是 Gemini 2.5 Pro，一个由 Google 训练的强大 AI。有什么我能帮你的吗？😊";
+            let welcomeText = "Hi，我是 Gemini 2.5 Pro，一个由 Google 训练的强大 AI。有什么我能帮你的吗？😊";
+            let activePersonaPrompt = '';
+            
+            if (selectedPersonaPreset === 'custom') {
+                activePersonaPrompt = customPersonaPrompt;
+            } else if (selectedPersonaPreset !== 'default') {
+                activePersonaPrompt = presetPersonas[selectedPersonaPreset];
+            }
+            
             chatHistory = [
                 {
                     role: "model",
@@ -1040,6 +1161,7 @@
                 }
             ];
             chatContainer.innerHTML = `<div class="ai-message">${formatMessage(welcomeText)}<div class="message-time">${new Date().toLocaleTimeString()}</div></div>`;
+            saveChatHistory();
         }
         
         // 根据 chatHistory 数组渲染聊天界面
@@ -1047,15 +1169,11 @@
             chatContainer.innerHTML = ''; // 清空现有内容
             chatHistory.forEach(message => {
                 const sender = message.role === 'user' ? 'user' : 'ai';
-                // 注意：localStorage 只保存了 text part，媒体信息不会恢复显示
                 if (message.parts && message.parts.length > 0 && message.parts[0].text) {
-                     // 这里简化处理，只显示文本部分，不处理多部分或非文本部分
-                     // 如果需要支持多模态历史记录恢复，需要更复杂的逻辑
-                    const textContent = message.parts.map(part => part.text || '').join(''); // 合并所有文本部分
-                    addMessageToChat(sender, textContent, null, true); // 传递 isHistory = true 避免重复保存
+                    const textContent = message.parts.map(part => part.text || '').join('');
+                    addMessageToChat(sender, textContent, null, true);
                 }
             });
-             // 滚动到底部
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
         
@@ -1066,7 +1184,6 @@
                 console.log("聊天记录已保存到 localStorage 💾");
             } catch (e) {
                 console.error("保存聊天记录失败:", e);
-                // 可以在这里添加一些用户提示，比如存储空间已满
             }
         }
         
@@ -1167,8 +1284,6 @@
             if (displayMessage) {
                 userMessageParts.push({ text: displayMessage });
             }
-            // 注意：本地存储目前不保存媒体信息，这部分仅用于API请求
-            // 如果需要保存媒体信息，需要修改 saveChatHistory 和 loadChatHistory 逻辑
             
             // 显示加载指示器
             const loadingIndicator = document.createElement('div');
@@ -1191,138 +1306,64 @@
             }
             
             try {
-                // 调用 Gemini API
-                const response = await generateContent(message, mediaInfo);
-                
-                // 移除加载指示器
-                chatContainer.removeChild(loadingIndicator);
-                
-                // 处理响应
-                if (response) {
-                    // 添加用户消息到历史记录 (在收到回复前添加，确保顺序正确)
-                    // 检查上一条是否已经是用户的消息，避免重复添加（虽然理论上不会）
-                     if (chatHistory.length === 0 || chatHistory[chatHistory.length - 1].role !== 'user') {
-                         chatHistory.push({
-                             role: "user",
-                             parts: userMessageParts // 使用上面构建的 parts
-                         });
-                     } else {
-                         // 如果上一条已经是 user 消息，可以合并 parts 或替换，这里简单替换
-                         chatHistory[chatHistory.length - 1].parts = userMessageParts;
-                     }
-
-                    // 添加 AI 回复到聊天区域
-                    addMessageToChat('ai', response); // isHistory 默认为 false，会触发保存
-                    
-                    // 更新聊天历史 (仅保存文本部分和搜索结果)
-                    const responseText = typeof response === 'object' ? response.text : response;
-                     // Google搜索结果暂时不保存到历史记录，以简化存储
-                    chatHistory.push({
-                        role: "model",
-                         // 暂时只保存text部分到历史记录
-                        parts: [{ text: responseText }] 
-                    });
-                    
-                    // 保存更新后的聊天记录
-                    saveChatHistory(); // 在AI回复添加并更新历史后保存
-                    
-                    // 确保清除媒体文件状态
-                    currentMediaFile = null;
-                    currentMediaType = null;
-                    currentMediaUri = null;
+                // 获取当前激活的角色提示
+                let activePersonaPrompt = '';
+                if (selectedPersonaPreset === 'custom') {
+                    activePersonaPrompt = customPersonaInput.value.trim();
+                } else if (selectedPersonaPreset !== 'default') {
+                    activePersonaPrompt = presetPersonas[selectedPersonaPreset];
                 }
-            } catch (error) {
-                 console.error('Error:', error);
                 
-                // 移除加载指示器
-                 chatContainer.removeChild(loadingIndicator);
+                // 构造系统指令（如果设置了角色）
+                const systemInstruction = activePersonaPrompt
+                    ? [
+                        { role: "user", parts: [{ text: `(System Command: Please adopt the following persona for our entire conversation: ${activePersonaPrompt})` }] },
+                    ]
+                    : [];
                 
-                 // 显示错误消息
-                addMessageToChat('ai', `抱歉，处理请求时出错：${error.message || '未知错误'}`);
-                // 出错时不保存历史记录
-            }
-        }
-        
-        // 生成内容函数
-        async function generateContent(userMessage, mediaInfo) {
-            try {
-                // 从设置获取参数
-                const temperature = parseFloat(temperatureSlider.value);
-                const topP = parseFloat(topPSlider.value);
-                const topK = parseInt(topKSlider.value);
-                const maxTokens = parseInt(maxTokensSelect.value);
-                const useGoogleSearch = enableGoogleSearch.checked;
-                const safetyLevel = safetyLevelSelect.value;
-                
-                // 准备请求体 - 直接使用内存中的 chatHistory 克隆
-                // **重要**: 过滤掉可能不适合发送给API的历史记录结构（如果本地存储了额外信息）
-                // 当前实现中，chatHistory 只包含 {role: 'user'/'model', parts: [{text: ...}]} 结构，可以直接使用
-                const apiHistory = JSON.parse(JSON.stringify(chatHistory)); 
-                
-                // **重要**: 移除最后一条AI消息，因为API调用时 history 只应包含到上一轮为止的内容
-                if (apiHistory.length > 0 && apiHistory[apiHistory.length - 1].role === 'model') {
-                    // 如果是从空记录开始的第一条用户消息，则历史为空
-                    // if (apiHistory.length > 1) { // 保留第一条欢迎消息
-                    //      apiHistory.pop(); // 移除最后一条 model 消息
-                    // } 
-                    // 修正：不应该移除欢迎消息，而是移除上一轮的model回复
-                    // 如果历史记录最后一条是 model，就移除它
-                    // （这个逻辑可能需要根据API的具体要求调整，Gemini API需要完整的对话历史）
-                    // 保持原样，Gemini API 通常需要完整的上下文
-                }
-
                 // 构造当前用户输入的部分
                 const currentUserParts = [];
-                // 添加媒体文件部分（必须在文本之前！）
-                 if (mediaInfo && mediaInfo.uri && mediaInfo.type) {
-                     let mimeType = mediaInfo.file.type;
+                if (mediaInfo && mediaInfo.uri && mediaInfo.type) {
+                    let mimeType = mediaInfo.file.type;
                     
-                     if (mimeType && mediaInfo.uri) {
-                         currentUserParts.push({
-                             file_data: {
-                                 mime_type: mimeType,
-                                 file_uri: mediaInfo.uri
-                             }
-                         });
-                     }
-                 }
-                // 添加文本部分（如果有）
-                if (userMessage) {
-                    currentUserParts.push({ text: userMessage });
+                    if (mimeType && mediaInfo.uri) {
+                        currentUserParts.push({
+                            file_data: {
+                                mime_type: mimeType,
+                                file_uri: mediaInfo.uri
+                            }
+                        });
+                    }
                 }
+                if (message) {
+                    currentUserParts.push({ text: message });
+                }
+                
+                // 构建最终的 contents 数组：系统指令 + 历史记录 + 当前用户输入
+                const finalContents = [
+                    ...systemInstruction,
+                    ...chatHistory,
+                    { role: "user", parts: currentUserParts }
+                ];
                 
                 // 构建API请求数据
                 const requestData = {
-                    // contents 应该包含历史记录 + 当前用户输入
-                    // contents: apiHistory.concat([{ role: "user", parts: currentUserParts }]), // 将当前输入追加到历史后
-                    contents: [...apiHistory, { role: "user", parts: currentUserParts }], // 使用扩展运算符更清晰
+                    contents: finalContents,
                     generationConfig: {
-                        temperature: temperature,
-                        topK: topK,
-                        topP: topP,
-                        maxOutputTokens: maxTokens,
+                        temperature: parseFloat(temperatureSlider.value),
+                        topK: parseInt(topKSlider.value),
+                        topP: parseFloat(topPSlider.value),
+                        maxOutputTokens: parseInt(maxTokensSelect.value),
                         responseMimeType: "text/plain"
-                    }
+                    },
+                    safetySettings: safetyLevelSelect.value !== 'BLOCK_NONE' ? [
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: safetyLevelSelect.value },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: safetyLevelSelect.value },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: safetyLevelSelect.value },
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: safetyLevelSelect.value }
+                    ] : [],
+                    tools: enableGoogleSearch.checked ? [{ google_search: {} }] : undefined
                 };
-                
-                // 添加安全设置
-                if (safetyLevel !== 'BLOCK_NONE') {
-                    requestData.safetySettings = [
-                        { category: "HARM_CATEGORY_HARASSMENT", threshold: safetyLevel },
-                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: safetyLevel },
-                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: safetyLevel },
-                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: safetyLevel }
-                    ];
-                }
-                
-                // 如果启用了Google搜索工具，添加tools配置
-                if (useGoogleSearch) {
-                    requestData.tools = [
-                        {
-                            google_search: {}
-                        }
-                    ];
-                }
                 
                 // 使用服务器端点代理请求
                 const response = await fetch('/api/gemini-chat', {
@@ -1347,7 +1388,7 @@
                 
                 const data = await response.json();
                 
-                // 检查响应中是否有内容
+                // 处理响应
                 if (data.candidates && data.candidates.length > 0 && 
                     data.candidates[0].content && 
                     data.candidates[0].content.parts && 
@@ -1364,17 +1405,40 @@
                         .join('\n');
                     
                     // 返回合并后的文本和搜索结果
-                    return {
-                        text: allTextParts,
-                        searchResults: searchResults.length > 0 ? searchResults : null,
-                        searchQueries: webSearchQueries.length > 0 ? webSearchQueries : null
-                    };
-                } else {
-                    throw new Error('无法获取 AI 回复');
+                    const responseText = typeof data.candidates[0].content === 'object' ? data.candidates[0].content.parts.map(part => part.text || '').join('\n') : data.candidates[0].content;
+                    
+                    // 添加 AI 回复到聊天区域
+                    addMessageToChat('ai', responseText, null, false);
+                    
+                    // 更新聊天历史 (仅保存文本部分和搜索结果)
+                    chatHistory.push({
+                        role: "model",
+                        parts: [{ text: responseText }]
+                    });
+                    
+                    // 保存更新后的聊天记录
+                    saveChatHistory();
+                    
+                    // 确保清除媒体文件状态
+                    currentMediaFile = null;
+                    currentMediaType = null;
+                    currentMediaUri = null;
                 }
             } catch (error) {
                 console.error('生成内容出错:', error);
-                throw error;
+                let errorMessage = error.message || '未知错误';
+                if (error.response && error.response.data && error.response.data.error) {
+                    errorMessage = error.response.data.error.message;
+                } else if (typeof error === 'string') {
+                    try {
+                        const parsedError = JSON.parse(error);
+                        if (parsedError.error && parsedError.error.message) {
+                            errorMessage = parsedError.error.message;
+                        }
+                    } catch (parseErr) { /* 忽略解析错误 */ }
+                }
+                console.error('生成内容出错:', errorMessage);
+                throw new Error(errorMessage);
             }
         }
         
@@ -1432,12 +1496,6 @@
             
             // 滚动到底部
             chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            // 如果不是从历史记录加载，并且是 AI 消息，则保存历史记录
-            // 修正：保存操作统一移到 sendMessage 成功回调中
-            // if (!isHistory && sender === 'ai') {
-            //     saveChatHistory(); 
-            // }
         }
         
         // 格式化消息，处理链接和代码等
