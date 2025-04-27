@@ -1388,6 +1388,11 @@
                 
                 const data = await response.json();
                 
+                // 在移除加载指示器前添加检查
+                if (loadingIndicator && chatContainer.contains(loadingIndicator)) {
+                    chatContainer.removeChild(loadingIndicator);
+                }
+
                 // 处理响应
                 if (data.candidates && data.candidates.length > 0 && 
                     data.candidates[0].content && 
@@ -1425,20 +1430,15 @@
                     currentMediaUri = null;
                 }
             } catch (error) {
-                console.error('生成内容出错:', error);
-                let errorMessage = error.message || '未知错误';
-                if (error.response && error.response.data && error.response.data.error) {
-                    errorMessage = error.response.data.error.message;
-                } else if (typeof error === 'string') {
-                    try {
-                        const parsedError = JSON.parse(error);
-                        if (parsedError.error && parsedError.error.message) {
-                            errorMessage = parsedError.error.message;
-                        }
-                    } catch (parseErr) { /* 忽略解析错误 */ }
+                console.error('Error:', error);
+
+                // 在移除加载指示器前添加检查
+                if (loadingIndicator && chatContainer.contains(loadingIndicator)) {
+                    chatContainer.removeChild(loadingIndicator);
                 }
-                console.error('生成内容出错:', errorMessage);
-                throw new Error(errorMessage);
+
+                // 显示错误消息
+                addMessageToChat('ai', `抱歉，处理请求时出错：${error.message || '未知错误'}`);
             }
         }
         
